@@ -163,19 +163,19 @@ const filteredKalaas = kalaas.filter((item) =>
       {
         title: "Shiva",
         image:
-          "https://images.unsplash.com/photo-1470770841072-f978cf4d019e",
+          "/shiva.png",
       },
 
       {
         title: "Krishna",
         image:
-          "https://images.unsplash.com/photo-1441974231531-c6227db76b6e",
+          "/krishnananba.png",
       },
 
       {
         title: "Durga Maa",
         image:
-          "/durgamaa.png",
+          "/durgama.png",
       },
 
     ];
