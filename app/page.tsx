@@ -229,7 +229,7 @@ const filteredKalaas = kalaas.filter((item) =>
             <img
               src={item.image}
               alt={item.title}
-              className="w-full h-72 object-cover"
+              className="w-full h-[500px] object-cover"
             />
 
             <div className="p-5">
@@ -274,7 +274,7 @@ const filteredKalaas = kalaas.filter((item) =>
 
       <div
         key={post.id}
-        className="bg-zinc-900 rounded-2xl overflow-hidden"
+        className="bg-zinc-900 rounded-3xl overflow-hidden shadow-2xl hover:scale-105 transition-all duration-300"
       >
 
         <img
@@ -284,6 +284,17 @@ const filteredKalaas = kalaas.filter((item) =>
         />
 
         <div className="p-4">
+          <div className="flex gap-4 mt-4">
+
+            <a
+              href={post.image}
+              download
+              className="bg-purple-600 px-4 py-2 rounded-xl"
+           >
+              Download
+           </a>
+
+        </div>
 
           <h2 className="text-2xl font-bold">
             {post.title}
@@ -292,6 +303,23 @@ const filteredKalaas = kalaas.filter((item) =>
           <p className="text-zinc-400 mt-2">
             {post.category}
           </p>
+          <div className="flex gap-4 mt-4">
+
+            <button
+              className="bg-pink-600 px-4 py-2 rounded-xl"
+           >
+              ❤️ Like
+            </button>
+
+            <a
+              href={post.image}
+              download
+              className="bg-purple-600 px-4 py-2 rounded-xl"
+            >
+              Download
+            </a>
+
+          </div>
 
         </div>
 
