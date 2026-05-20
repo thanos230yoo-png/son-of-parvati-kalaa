@@ -50,13 +50,7 @@ export default function DurgaMaaPage() {
         Durga Maa Kalaa
       </h1>
 
-      {/* STATIC MAIN IMAGE */}
-
-      <img
-        src="/durgamaa.png"
-        alt="Durga Maa"
-        className="w-full max-w-md mx-auto rounded-3xl mb-16 border border-red-500 shadow-2xl"
-      />
+      
 
       {/* EMPTY MESSAGE */}
 
