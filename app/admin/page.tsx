@@ -7,6 +7,7 @@ export default function AdminPage() {
 
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
+  const [tags, setTags] = useState("");
   const [image, setImage] = useState<any>(null);
 
   async function uploadPost() {
@@ -47,7 +48,8 @@ export default function AdminPage() {
           title,
           image: imageUrl,
           category,
-        },
+          tags,
+        }
       ]);
 
     if (error) {
@@ -95,6 +97,17 @@ export default function AdminPage() {
           <option value="General">General</option>
 
         </select>
+        <input
+          type="text"
+          placeholder="Search tags"
+          value={tags}
+          onChange={(e) => setTags(e.target.value)}
+          className="w-full p-4 rounded-xl bg-zinc-900"
+        />
+          
+          
+          
+        
 
         {/* IMAGE */}
 

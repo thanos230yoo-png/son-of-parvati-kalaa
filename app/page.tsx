@@ -313,7 +313,7 @@ const filteredKalaas = kalaas.filter((item) =>
                   .update({
                     likes: (post.likes || 0) + 1
                  })
-                 .eq("id", post.id);
+                 .or(`title.ilike.%${search}%,tags.ilike.%${search}%`)
 
                 getPosts();
 
