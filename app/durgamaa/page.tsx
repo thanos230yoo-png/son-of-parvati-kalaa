@@ -3,7 +3,7 @@ export default function DurgaMaa() {
     <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center">
 
       <img
-        src="/durgamaa.jpg"
+        src="/durgamaa.png"
         alt="Durga Maa"
         className="w-[500px] rounded-3xl border border-red-500 shadow-2xl"
       />
