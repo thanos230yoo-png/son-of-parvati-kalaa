@@ -36,15 +36,19 @@ export default function AdminPage() {
   const imageUrl = publicUrlData.publicUrl;
 
   // save post to database
-  const { error } = await supabase
-    .from("posts")
-    .insert([
-      {
-        title,
-        image: imageUrl,
-        category,
-      },
-    ]);
+  const { data: insertData, error } = await supabase
+  .from("posts")
+  .insert([
+    {
+      title: title,
+      image: imageUrl,
+      category: category,
+    },
+  ])
+  .select();
+
+console.log(insertData);
+console.log(error);
 
   if (error) {
     console.log(error);
