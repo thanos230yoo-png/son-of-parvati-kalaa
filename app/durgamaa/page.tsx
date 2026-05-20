@@ -46,18 +46,47 @@ export default function DurgaMaaPage() {
           >
 
             <img
-              src={post.image}
+              src={post.image.url}
               alt={post.title}
               className="w-full h-[500px] object-cover"
             />
 
             <div className="p-5">
 
-              <h2 className="text-2xl font-bold">
-                {post.title}
-              </h2>
+  <h2 className="text-2xl font-bold">
+    {post.title}
+  </h2>
 
-            </div>
+  <div className="flex gap-3 mt-4">
+
+    <a
+      href={post.image_url}
+      download
+      target="_blank"
+      className="bg-purple-700 hover:bg-purple-900 px-4 py-2 rounded-xl"
+    >
+      Download
+    </a>
+
+    <button
+      onClick={async () => {
+
+        await supabase
+          .from("posts")
+          .delete()
+          .eq("id", post.id);
+
+        getPosts();
+
+      }}
+      className="bg-red-700 hover:bg-red-900 px-4 py-2 rounded-xl"
+    >
+      Delete
+    </button>
+
+  </div>
+
+</div>
 
           </div>
 
