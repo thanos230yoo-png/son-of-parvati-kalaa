@@ -43,7 +43,7 @@ export default function KaliMaaPage() {
 
       {/* GALLERY */}
 
-      <div className="grid md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
 
         {posts.map((post) => (
 
@@ -53,9 +53,9 @@ export default function KaliMaaPage() {
           >
 
             <img
-              src={post.image}
+              src={post.image_url}
               alt={post.title}
-              className="w-full h-[500px] object-cover"
+              className="w-full h-[500px] object-cover hover:scale-105 transition duration-300"
             />
 
             <div className="p-5">
@@ -63,6 +63,15 @@ export default function KaliMaaPage() {
               <h2 className="text-2xl font-bold">
                 {post.title}
               </h2>
+
+              <a
+                href={post.image_url}
+                download
+                target="_blank"
+                className="mt-4 inline-block bg-purple-700 hover:bg-purple-900 px-4 py-2 rounded-xl"
+              >
+                Download
+              </a>
 
             </div>
 

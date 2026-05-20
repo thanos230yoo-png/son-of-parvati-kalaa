@@ -22,11 +22,10 @@ export default function KrishnaPage() {
   }
 
   return (
-
     <main className="min-h-screen bg-black text-white p-10">
 
       <button
-        onClick={() => window.history.back()}
+        onClick={() => window.location.href = "/"}
         className="fixed top-6 left-6 z-50 bg-zinc-900 px-4 py-2 rounded-full border border-pink-700 hover:bg-pink-700 transition"
       >
         ← Back
@@ -36,7 +35,7 @@ export default function KrishnaPage() {
         Krishna Kalaa
       </h1>
 
-      <div className="grid md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
 
         {posts.map((post) => (
 
@@ -46,9 +45,9 @@ export default function KrishnaPage() {
           >
 
             <img
-              src={post.image}
+              src={post.image_url}
               alt={post.title}
-              className="w-full h-[500px] object-cover"
+              className="w-full h-[500px] object-cover hover:scale-105 transition duration-300"
             />
 
             <div className="p-5">
@@ -56,6 +55,15 @@ export default function KrishnaPage() {
               <h2 className="text-2xl font-bold">
                 {post.title}
               </h2>
+
+              <a
+                href={post.image_url}
+                download
+                target="_blank"
+                className="mt-4 inline-block bg-pink-700 hover:bg-pink-900 px-4 py-2 rounded-xl"
+              >
+                Download
+              </a>
 
             </div>
 
@@ -66,6 +74,5 @@ export default function KrishnaPage() {
       </div>
 
     </main>
-
   );
 }
