@@ -76,7 +76,7 @@ export default function DurgaMaaPage() {
             <img
               src={post.image}
               alt={post.title}
-              className="w-full h-[500px] object-cover hover:scale-105 transition duration-300"
+              className="w-full aspect-square object-cover hover:scale-105 transition duration-300 rounded-2xl"
             />
 
             <div className="p-5">
