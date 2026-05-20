@@ -55,7 +55,7 @@ export default function KaliMaaPage() {
     <img
       src={post.image}
       alt={post.title}
-      className="w-full aspect-square object-cover rounded-2xl"
+      className="w-full h-[500px] object-cover"
     />
 
     <div className="p-5">
