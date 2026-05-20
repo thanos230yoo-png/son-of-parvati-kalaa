@@ -72,7 +72,7 @@ const filteredKalaas = kalaas.filter((item) =>
         </button>
 
       </div>
-      
+
       {/* CATEGORIES */}
       <div className="flex flex-wrap justify-center gap-4 mt-10 px-6">
 
@@ -134,34 +134,112 @@ const filteredKalaas = kalaas.filter((item) =>
       {/* GALLERY */}
 
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-20 w-[90%] max-w-6xl">
-  {filteredKalaas.map((item) => (
 
- 
-    <div
-      key={item.title}
-      className="bg-black/70 backdrop-blur-sm border border-zinc-800 rounded-3xl overflow-hidden hover:border-purple-500 transition duration-300"
-    >
-      <img
-        src={item.image}
-        alt={item.title}
-        className="w-full h-72 object-cover"
-      />
+  {(() => {
 
-      <div className="p-5">
+    const kalaas = [
 
-        <h2 className="text-2xl font-semibold">
-          {item.title}
-        </h2>
+      {
+        title: "Kali Maa",
+        image:
+          "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+      },
 
-       <Link
-         href={`/${item.title.toLowerCase().replace(" ", "")}`}
-         className="mt-4 inline-block px-4 py-2 rounded-full bg-purple-700 hover:bg-red-600 transition"
-       >
-         View Kalaa
-       </Link>
-      </div>
-    </div>
-  ))}
+      {
+        title: "Shiva",
+        image:
+          "https://images.unsplash.com/photo-1470770841072-f978cf4d019e",
+      },
+
+      {
+        title: "Krishna",
+        image:
+          "https://images.unsplash.com/photo-1441974231531-c6227db76b6e",
+      },
+
+      {
+        title: "Durga Maa",
+        image:
+          "/durgamaa.jpg",
+      },
+
+    ];
+
+    const filteredKalaas = kalaas.filter((item) =>
+      item.title.toLowerCase().includes(search.toLowerCase())
+    );
+
+    return (
+      search ? (
+        filteredKalaas.slice(0, 1).map((item) => (
+
+          <div
+            key={item.title}
+            className="bg-black/70 backdrop-blur-sm border border-purple-500 rounded-3xl overflow-hidden"
+          >
+
+            <img
+              src={item.image}
+              alt={item.title}
+              className="w-full h-[500px] object-cover"
+            />
+
+            <div className="p-5">
+
+              <h2 className="text-3xl font-bold">
+                {item.title}
+              </h2>
+
+              <Link
+                href={`/${item.title.toLowerCase().replace(" ", "")}`}
+                className="mt-4 inline-block px-5 py-3 rounded-full bg-purple-700 hover:bg-red-600 transition"
+              >
+                Open Kalaa
+              </Link>
+
+            </div>
+
+          </div>
+
+        ))
+      ) : (
+
+        kalaas.map((item) => (
+
+          <div
+            key={item.title}
+            className="bg-black/70 backdrop-blur-sm border border-zinc-800 rounded-3xl overflow-hidden hover:border-purple-500 transition duration-300"
+          >
+
+            <img
+              src={item.image}
+              alt={item.title}
+              className="w-full h-72 object-cover"
+            />
+
+            <div className="p-5">
+
+              <h2 className="text-2xl font-semibold">
+                {item.title}
+              </h2>
+
+              <Link
+                href={`/${item.title.toLowerCase().replace(" ", "")}`}
+                className="mt-4 inline-block px-4 py-2 rounded-full bg-purple-700 hover:bg-red-600 transition"
+              >
+                View Kalaa
+              </Link>
+
+            </div>
+
+          </div>
+
+        ))
+
+      )
+    );
+
+  })()}
 
 </div>
 
