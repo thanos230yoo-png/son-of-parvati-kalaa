@@ -157,7 +157,7 @@ const filteredKalaas = kalaas.filter((item) =>
       {
         title: "Kali Maa",
         image:
-          "https://kali.png",
+          "/kali.png",
       },
 
       {
