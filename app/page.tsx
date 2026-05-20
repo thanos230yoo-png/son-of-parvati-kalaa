@@ -157,7 +157,7 @@ const filteredKalaas = kalaas.filter((item) =>
       {
         title: "Kali Maa",
         image:
-          "/kalii.png",
+          "/kali.png",
       },
 
       {
@@ -196,7 +196,7 @@ const filteredKalaas = kalaas.filter((item) =>
             <img
               src={item.image}
               alt={item.title}
-              className="w-full h-[500px] object-cover"
+              className="w-full aspect-square object-cover"
             />
 
             <div className="p-5">
