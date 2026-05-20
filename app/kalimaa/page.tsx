@@ -47,38 +47,75 @@ export default function KaliMaaPage() {
 
         {posts.map((post) => (
 
-          <div
-            key={post.id}
-            className="bg-zinc-900 rounded-3xl overflow-hidden"
-          >
+  <div
+    key={post.id}
+    className="bg-zinc-900 rounded-3xl overflow-hidden"
+  >
 
-            <img
-              src={post.image_url}
-              alt={post.title}
-              className="w-full h-[500px] object-cover hover:scale-105 transition duration-300"
-            />
+    <img
+      src={post.image}
+      alt={post.title}
+      className="w-full h-[500px] object-cover"
+    />
 
-            <div className="p-5">
+    <div className="p-5">
 
-              <h2 className="text-2xl font-bold">
-                {post.title}
-              </h2>
+      <h2 className="text-2xl font-bold">
+        {post.title}
+      </h2>
 
-              <a
-                href={post.image_url}
-                download
-                target="_blank"
-                className="mt-4 inline-block bg-purple-700 hover:bg-purple-900 px-4 py-2 rounded-xl"
-              >
-                Download
-              </a>
+      <div className="flex gap-3 mt-4">
 
-            </div>
+        <a
+          href={post.image}
+          download
+          target="_blank"
+          className="bg-purple-700 hover:bg-purple-900 px-4 py-2 rounded-xl"
+        >
+          Download
+        </a>
 
-          </div>
+        <button
+          onClick={async () => {
 
-        ))}
+            await supabase
+              .from("posts")
+              .update({
+                likes: (post.likes || 0) + 1
+              })
+              .eq("id", post.id);
 
+            getPosts();
+
+          }}
+          className="bg-pink-700 hover:bg-pink-900 px-4 py-2 rounded-xl"
+        >
+          ❤️ {post.likes || 0}
+        </button>
+
+        <button
+          onClick={async () => {
+
+            await supabase
+              .from("posts")
+              .delete()
+              .eq("id", post.id);
+
+            getPosts();
+
+          }}
+          className="bg-red-700 hover:bg-red-900 px-4 py-2 rounded-xl"
+        >
+          Delete
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+))}
       </div>
 
     </main>
