@@ -15,21 +15,27 @@ export default function AdminPage() {
     return;
   }
 
-  const fileName = Date.now() + "-" + image.name;
+  const fileName = `${Date.now()}-${image.name}`;
 
-  const { error: uploadError } = await supabase.storage
+  // upload image to supabase storage
+  const { data: imageData, error: imageError } = await supabase.storage
     .from("kalaa")
     .upload(fileName, image);
 
-  if (uploadError) {
-    console.log(uploadError);
+  if (imageError) {
+    console.log(imageError);
     alert("Image upload failed");
     return;
   }
 
-  const imageUrl =
-    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/kalaa/${fileName}`;
+  // get public image url
+  const { data: publicUrlData } = supabase.storage
+    .from("kalaa")
+    .getPublicUrl(fileName);
 
+  const imageUrl = publicUrlData.publicUrl;
+
+  // save post to database
   const { error } = await supabase
     .from("posts")
     .insert([
@@ -42,9 +48,9 @@ export default function AdminPage() {
 
   if (error) {
     console.log(error);
-    alert("Database upload failed");
+    alert("Database insert failed");
   } else {
-    alert("Kalaa uploaded 🔥");
+    alert("Kalaa uploaded successfully 🔥");
   }
 }
   return (
@@ -58,8 +64,7 @@ export default function AdminPage() {
 
         <input
           type="file"
-          onChange={(e) => setImage(e.target.files![0])}
-        className="w-full bg-zinc-900 p-4 rounded-xl"
+          onChange={(e) => setImage(e.target.files?.[0] || null)}
         />
 
         <input
