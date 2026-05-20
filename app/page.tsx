@@ -1,6 +1,37 @@
 "use client";
 import Link from "next/link";
+import { useState } from "react";
 export default function Home() {
+  const [search, setSearch] = useState("")
+  const kalaas = [
+  {
+    title: "Kali Maa",
+    image:
+      "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+  },
+
+  {
+    title: "Shiva",
+    image:
+      "https://images.unsplash.com/photo-1470770841072-f978cf4d019e",
+  },
+
+  {
+    title: "Krishna",
+    image:
+      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e",
+  },
+
+  {
+    title: "Durga Maa",
+    image:
+      "https://images.unsplash.com/photo-1519608487953-e999c86e7455",
+  },
+];
+
+const filteredKalaas = kalaas.filter((item) =>
+  item.title.toLowerCase().includes(search.toLowerCase())
+);
   return (
     <main className="min-h-screen text-white relative overflow-x-hidden flex flex-col items-center">
 
@@ -24,14 +55,24 @@ export default function Home() {
       </div>
 
       {/* SEARCH */}
-      <div className="w-full max-w-xl px-4">
+      <div className="flex items-center gap-3 mt-8">
+
         <input
           type="text"
           placeholder="Search kalaa, edits, wallpapers..."
-          className="w-full bg-zinc-900 border border-red-800 rounded-full px-6 py-3 text-white outline-none"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-[600px] bg-zinc-900 border border-red-800 rounded-full px-6 py-3 text-white outline-none"
         />
-      </div>
 
+        <button
+          className="px-5 py-3 rounded-full bg-purple-700 hover:bg-red-600 transition"
+        >
+          🔍
+        </button>
+
+      </div>
+      
       {/* CATEGORIES */}
       <div className="flex flex-wrap justify-center gap-4 mt-10 px-6">
 
@@ -93,27 +134,9 @@ export default function Home() {
       {/* GALLERY */}
 
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-20 w-[90%] max-w-6xl">
+  {filteredKalaas.map((item) => (
 
-  {[
-    {
-      title: "Kali Maa",
-      image:
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-    },
-
-    {
-      title: "Shiva",
-      image:
-        "https://images.unsplash.com/photo-1470770841072-f978cf4d019e",
-    },
-
-    {
-      title: "Krishna",
-      image:
-        "https://images.unsplash.com/photo-1441974231531-c6227db76b6e",
-    },
-
-  ].map((item) => (
+ 
     <div
       key={item.title}
       className="bg-black/70 backdrop-blur-sm border border-zinc-800 rounded-3xl overflow-hidden hover:border-purple-500 transition duration-300"
