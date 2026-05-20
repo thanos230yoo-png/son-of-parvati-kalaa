@@ -160,7 +160,7 @@ const filteredKalaas = kalaas.filter((item) =>
       {
         title: "Durga Maa",
         image:
-          "/durgamaa.jpg",
+          "/durgamaa.png",
       },
 
     ];
