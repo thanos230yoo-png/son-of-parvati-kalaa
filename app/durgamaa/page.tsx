@@ -95,6 +95,23 @@ export default function DurgaMaaPage() {
                 >
                   Download
                 </a>
+                <button
+                  onClick={async () => {
+
+                    await supabase
+                      .from("posts")
+                      .update({
+                        likes: (post.likes || 0) + 1
+                    })
+                    .eq("id", post.id);
+
+                     getPosts();
+
+                  }}
+                  className="bg-pink-700 hover:bg-pink-900 px-4 py-2 rounded-xl"
+                >
+                  ❤️ {post.likes || 0}
+                </button>
 
                 <button
                   onClick={() => deletePost(post.id)}
