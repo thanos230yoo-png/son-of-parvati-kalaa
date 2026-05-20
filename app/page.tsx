@@ -1,7 +1,22 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "./lib/supabase";
 export default function Home() {
+  const [posts, setPosts] = useState<any[]>([]);
+
+useEffect(() => {
+  getPosts();
+}, []);
+
+async function getPosts() {
+
+  const { data } = await supabase
+    .from("posts")
+    .select("*");
+
+  setPosts(data || []);
+}
   const [search, setSearch] = useState("")
   const kalaas = [
   {
@@ -247,6 +262,46 @@ const filteredKalaas = kalaas.filter((item) =>
       <div className="py-20 text-zinc-500 text-sm">
         Son Of Parvati • Kalaa Archive
       </div>
+    <div className="mt-20">
+
+  <h1 className="text-4xl font-bold text-center mb-10 text-purple-500">
+    Uploaded Kalaa
+  </h1>
+
+  <div className="grid md:grid-cols-3 gap-8">
+
+    {posts.map((post) => (
+
+      <div
+        key={post.id}
+        className="bg-zinc-900 rounded-2xl overflow-hidden"
+      >
+
+        <img
+          src={post.image}
+          alt={post.title}
+          className="w-full h-72 object-cover"
+        />
+
+        <div className="p-4">
+
+          <h2 className="text-2xl font-bold">
+            {post.title}
+          </h2>
+
+          <p className="text-zinc-400 mt-2">
+            {post.category}
+          </p>
+
+        </div>
+
+      </div>
+
+    ))}
+
+  </div>
+
+</div>
 
     </main>
   );
