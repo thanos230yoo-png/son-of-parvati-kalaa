@@ -157,7 +157,7 @@ const filteredKalaas = kalaas.filter((item) =>
       {
         title: "Kali Maa",
         image:
-          "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+          "https://kali.png",
       },
 
       {
@@ -330,7 +330,7 @@ const filteredKalaas = kalaas.filter((item) =>
               className="bg-pink-700 hover:bg-pink-900 px-4 py-2 rounded-xl"
             >
               ❤️ {post.likes || 0}
-              
+
             </button>
 
             <a
