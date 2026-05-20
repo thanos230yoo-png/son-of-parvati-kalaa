@@ -306,9 +306,22 @@ const filteredKalaas = kalaas.filter((item) =>
           <div className="flex gap-4 mt-4">
 
             <button
+              onClick={async () => {
+
+                await supabase
+                  .from("posts")
+                  .update({
+                    likes: (post.likes || 0) + 1
+                 })
+                 .eq("id", post.id);
+
+                getPosts();
+
+              }}
               className="bg-pink-600 px-4 py-2 rounded-xl"
-           >
-              ❤️ Like
+            >
+              ❤️ {post.likes || 0}
+            
             </button>
 
             <a
