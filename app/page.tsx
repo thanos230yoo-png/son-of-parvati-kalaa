@@ -84,13 +84,15 @@ async function uploadPost() {
       }
     ]);
 
-  if (error) {
+   if (error) {
 
-    console.log(error);
+     console.log(error);
 
-    alert("Database insert failed");
+     alert(error.message);
 
-  } else {
+   }
+
+  else {
 
     alert("Kalaa Uploaded 🔥");
 
