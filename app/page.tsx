@@ -17,9 +17,10 @@ export default function Home() {
   async function checkAdmin() {
 
     const { data } = await supabase.auth.getUser();
+    if (data.user?.email === "thanos230yoo@gmail.com") {
 
-    if (data.user) {
       setIsAdmin(true);
+
     }
   }
 
