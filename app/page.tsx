@@ -9,6 +9,10 @@ export default function Home() {
   const [posts, setPosts] = useState<any[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [search, setSearch] = useState("");
+  const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("");
+  const [tags, setTags] = useState("");
+  const [image, setImage] = useState<any>(null);
 
   async function checkAdmin() {
 
@@ -31,13 +35,68 @@ export default function Home() {
 
   async function deletePost(id: number) {
 
-    await supabase
-      .from("posts")
-      .delete()
-      .eq("id", id);
+  await supabase
+    .from("posts")
+    .delete()
+    .eq("id", id);
+
+  getPosts();
+}
+
+async function uploadPost() {
+
+  if (!image) {
+    alert("Choose image first");
+    return;
+  }
+
+  const fileName = `${Date.now()}-${image.name}`;
+
+  const { error: imageError } = await supabase.storage
+    .from("kalaa")
+    .upload(fileName, image);
+
+  if (imageError) {
+
+    console.log(imageError);
+
+    alert("Image upload failed");
+
+    return;
+  }
+
+  const { data } = supabase.storage
+    .from("kalaa")
+    .getPublicUrl(fileName);
+
+  const imageUrl = data.publicUrl;
+
+  const { error } = await supabase
+    .from("posts")
+    .insert([
+      {
+        title,
+        image: imageUrl,
+        category,
+        tags: tags || "",
+        likes: 0,
+      }
+    ]);
+
+  if (error) {
+
+    console.log(error);
+
+    alert("Database insert failed");
+
+  } else {
+
+    alert("Kalaa Uploaded 🔥");
 
     getPosts();
+
   }
+}
 
   useEffect(() => {
 
@@ -215,6 +274,63 @@ export default function Home() {
         ))}
 
       </div>
+      {isAdmin && (
+
+  <div className="w-[90%] max-w-4xl bg-black/70 border border-purple-900 rounded-3xl p-8 mt-20">
+
+    <h1 className="text-4xl font-black text-center mb-8 bg-gradient-to-r from-purple-500 to-red-500 text-transparent bg-clip-text">
+      Upload Kalaa
+    </h1>
+
+    <div className="flex flex-col gap-6">
+
+      <input
+        type="text"
+        placeholder="Kalaa Title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        className="bg-zinc-900 p-4 rounded-xl outline-none"
+      />
+
+      <select
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
+        className="bg-zinc-900 p-4 rounded-xl outline-none"
+      >
+        <option value="">Choose Category</option>
+        <option value="Durga">Durga</option>
+        <option value="Kali">Kali</option>
+        <option value="Shiva">Shiva</option>
+        <option value="Krishna">Krishna</option>
+        <option value="General">General</option>
+      </select>
+
+      <input
+        type="text"
+        placeholder="Search Tags"
+        value={tags}
+        onChange={(e) => setTags(e.target.value)}
+        className="bg-zinc-900 p-4 rounded-xl outline-none"
+      />
+
+      <input
+        type="file"
+        onChange={(e) => setImage(e.target.files?.[0] || null)}
+        className="bg-zinc-900 p-4 rounded-xl"
+      />
+
+      <button
+        onClick={uploadPost}
+        className="bg-purple-700 hover:bg-red-700 transition py-4 rounded-xl font-bold"
+      >
+        Upload Kalaa
+      </button>
+
+    </div>
+
+  </div>
+
+)}
 
       {/* UPLOADED KALAA */}
 
@@ -291,6 +407,7 @@ export default function Home() {
                   </a>
 
                   {/* DELETE */}
+                  
 
                   {isAdmin && (
 
