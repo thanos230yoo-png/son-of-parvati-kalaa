@@ -19,11 +19,13 @@ export default function LoginPage() {
     });
 
     if (error) {
-      alert("Login failed 😭🔥");
+
+      alert("Username or password is incorrect ");
+
       return;
     }
 
-    alert("Logged in 😭🔥");
+    alert("Logged in ");
 
     router.push("/admin");
   }
