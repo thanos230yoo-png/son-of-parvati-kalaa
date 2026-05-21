@@ -101,11 +101,19 @@ async function uploadPost() {
 
   useEffect(() => {
 
-    getPosts();
+  getPosts();
+
+  const loadAdmin = async () => {
+
+    await supabase.auth.getSession();
 
     checkAdmin();
 
-  }, []);
+  };
+
+  loadAdmin();
+
+}, []);
 
   const kalaas = [
 
