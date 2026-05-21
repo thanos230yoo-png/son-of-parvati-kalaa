@@ -7,12 +7,18 @@ import { useRouter } from "next/navigation";
 
 export default function AdminPage() {
   const router = useRouter();
-  useEffect(() => {
 
-  checkUser();
+const [posts, setPosts] = useState<any[]>([]);
 
-}, []);
+async function getPosts() {
 
+  const { data } = await supabase
+    .from("posts")
+    .select("*")
+    .order("id", { ascending: false });
+
+  setPosts(data || []);
+}
 async function checkUser() {
 
   const { data } = await supabase.auth.getUser();
@@ -24,10 +30,21 @@ async function checkUser() {
   }
 }
 
+useEffect(() => {
+
+  checkUser();
+
+  getPosts();
+
+}, []);
+
+
+
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
   const [tags, setTags] = useState("");
   const [image, setImage] = useState<any>(null);
+ 
 
   async function uploadPost() {
 
@@ -76,6 +93,7 @@ async function checkUser() {
       alert("Database insert failed");
     } else {
       alert("Kalaa Uploaded 🔥");
+      getPosts();
     }
   }
 
@@ -146,6 +164,50 @@ async function checkUser() {
         </button>
 
       </div>
+      <div className="mt-20 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+  {posts.map((post) => (
+
+    <div
+      key={post.id}
+      className="bg-zinc-900 rounded-3xl overflow-hidden"
+    >
+
+      <img
+        src={post.image}
+        alt={post.title}
+        className="w-full aspect-square object-cover"
+      />
+
+      <div className="p-5">
+
+        <h2 className="text-2xl font-bold">
+          {post.title}
+        </h2>
+
+        <button
+          onClick={async () => {
+
+            await supabase
+              .from("posts")
+              .delete()
+              .eq("id", post.id);
+
+            getPosts();
+
+          }}
+          className="mt-4 bg-red-700 hover:bg-red-900 px-4 py-2 rounded-xl"
+        >
+          Delete
+        </button>
+
+      </div>
+
+    </div>
+
+  ))}
+
+</div>
 
     </main>
 
