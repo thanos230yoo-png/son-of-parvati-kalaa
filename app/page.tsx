@@ -150,18 +150,7 @@ async function uploadPost() {
 
       </div>
 
-      {/* ADMIN FLOATING BUTTON */}
-
-      {isAdmin && (
-
-        <a
-          href="/admin"
-          className="fixed bottom-6 right-6 bg-red-700 hover:bg-red-900 px-6 py-3 rounded-full z-50"
-        >
-          ADMIN
-        </a>
-
-      )}
+      
 
       {/* HEADER */}
 
