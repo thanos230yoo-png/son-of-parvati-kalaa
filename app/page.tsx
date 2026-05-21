@@ -3,11 +3,20 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "./lib/supabase";
 export default function Home() {
-  const [posts, setPosts] = useState<any[]>([]);
 
-useEffect(() => {
-  getPosts();
-}, []);
+  const [posts, setPosts] = useState<any[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  async function checkAdmin() {
+
+    const { data } = await supabase.auth.getUser();
+
+    if (data.user) {
+
+      setIsAdmin(true);
+
+    }
+  }
 
 async function getPosts() {
 
@@ -48,6 +57,7 @@ const filteredKalaas = kalaas.filter((item) =>
   item.title.toLowerCase().includes(search.toLowerCase())
 );
   return (
+    <>
     <main className="min-h-screen text-white relative overflow-x-hidden flex flex-col items-center">
 
       <div className="fixed inset-0 -z-10">
@@ -339,6 +349,25 @@ const filteredKalaas = kalaas.filter((item) =>
               className="bg-purple-600 px-4 py-2 rounded-xl"
             >
               Download
+              {isAdmin && (
+
+  <button
+    onClick={async () => {
+
+      await supabase
+        .from("posts")
+        .delete()
+        .eq("id", post.id);
+
+      getPosts();
+
+    }}
+    className="bg-red-700 hover:bg-red-900 px-4 py-2 rounded-xl"
+  >
+    Delete
+  </button>
+
+)}
             </a>
 
           </div>
@@ -354,5 +383,17 @@ const filteredKalaas = kalaas.filter((item) =>
 </div>
 
     </main>
+    {isAdmin && (
+
+  <a
+    href="/admin"
+    className="fixed bottom-6 right-6 bg-red-700 hover:bg-red-900 px-6 py-3 rounded-full z-50"
+  >
+    ADMIN
+  </a>
+
+)}
+
+</>
   );
 }

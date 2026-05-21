@@ -164,48 +164,56 @@ useEffect(() => {
         </button>
 
       </div>
-      <div className="mt-20 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="mt-20 w-full">
 
-  {posts.map((post) => (
+  <h2 className="text-4xl font-black mb-10 text-center text-red-500">
+    Delete Kalaa
+  </h2>
 
-    <div
-      key={post.id}
-      className="bg-zinc-900 rounded-3xl overflow-hidden"
-    >
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-      <img
-        src={post.image}
-        alt={post.title}
-        className="w-full aspect-square object-cover"
-      />
+    {posts.map((post) => (
 
-      <div className="p-5">
+      <div
+        key={post.id}
+        className="bg-zinc-900 rounded-3xl overflow-hidden"
+      >
 
-        <h2 className="text-2xl font-bold">
-          {post.title}
-        </h2>
+        <img
+          src={post.image}
+          alt={post.title}
+          className="w-full aspect-square object-cover"
+        />
 
-        <button
-          onClick={async () => {
+        <div className="p-5">
 
-            await supabase
-              .from("posts")
-              .delete()
-              .eq("id", post.id);
+          <h2 className="text-2xl font-bold">
+            {post.title}
+          </h2>
 
-            getPosts();
+          <button
+            onClick={async () => {
 
-          }}
-          className="mt-4 bg-red-700 hover:bg-red-900 px-4 py-2 rounded-xl"
-        >
-          Delete
-        </button>
+              await supabase
+                .from("posts")
+                .delete()
+                .eq("id", post.id);
+
+              getPosts();
+
+            }}
+            className="mt-4 bg-red-700 hover:bg-red-900 px-4 py-2 rounded-xl"
+          >
+            Delete
+          </button>
+
+        </div>
 
       </div>
 
-    </div>
+    ))}
 
-  ))}
+  </div>
 
 </div>
 
