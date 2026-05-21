@@ -115,31 +115,9 @@ async function uploadPost() {
 
 }, []);
 
-  const kalaas = [
+  
 
-    {
-      title: "Kali Maa",
-      image: "/kalii.png",
-    },
-
-    {
-      title: "Shiva",
-      image: "/shiva.png",
-    },
-
-    {
-      title: "Krishna",
-      image: "/krishnananba.png",
-    },
-
-    {
-      title: "Durga Maa",
-      image: "/durgama.png",
-    },
-
-  ];
-
-  const filteredKalaas = kalaas.filter((item) =>
+  const filteredKalaas = posts.filter((item) =>
     item.title.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -225,7 +203,7 @@ async function uploadPost() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-20 w-[90%] max-w-6xl">
 
-        {(search ? filteredKalaas : kalaas).map((item) => (
+        {(search ? filteredKalaas : posts).map((item) => (
 
           <div
             key={item.title}
