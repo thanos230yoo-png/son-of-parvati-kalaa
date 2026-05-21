@@ -4,12 +4,29 @@ import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
 export default function DurgaMaaPage() {
+  const [isAdmin, setIsAdmin] = useState(false);
+
+async function checkAdmin() {
+
+  const { data } = await supabase.auth.getUser();
+
+  if (data.user) {
+
+    setIsAdmin(true);
+
+  }
+}
 
   const [posts, setPosts] = useState<any[]>([]);
+  
 
   useEffect(() => {
-    getPosts();
-  }, []);
+
+  getPosts();
+
+  checkAdmin();
+
+}, []);
 
   async function getPosts() {
 
@@ -113,12 +130,25 @@ export default function DurgaMaaPage() {
                   ❤️ {post.likes || 0}
                 </button>
 
-                <button
-                  onClick={() => deletePost(post.id)}
-                  className="bg-red-700 hover:bg-red-900 px-4 py-2 rounded-xl"
-                >
-                  Delete
-                </button>
+                {isAdmin && (
+
+  <button
+    onClick={async () => {
+
+      await supabase
+        .from("posts")
+        .delete()
+        .eq("id", post.id);
+
+      getPosts();
+
+    }}
+    className="bg-red-700 hover:bg-red-900 px-4 py-2 rounded-xl"
+  >
+    Delete
+  </button>
+
+)}
 
               </div>
 

@@ -27,7 +27,7 @@ export default function LoginPage() {
 
     alert("Logged in ");
 
-    router.push("/admin");
+    router.push("/");
   }
 
   return (
