@@ -2,8 +2,27 @@
 
 import { useState } from "react";
 import { supabase } from "../lib/supabase";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function AdminPage() {
+  const router = useRouter();
+  useEffect(() => {
+
+  checkUser();
+
+}, []);
+
+async function checkUser() {
+
+  const { data } = await supabase.auth.getUser();
+
+  if (!data.user) {
+
+    router.push("/login");
+
+  }
+}
 
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
