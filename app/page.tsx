@@ -398,11 +398,11 @@ if (!user) {
   // CHECK IF ALREADY LIKED
 
   const { data: existingLike } = await supabase
-    .from("liked_posts")
-    .select("*")
-    .eq("post_id", post.id)
-    .eq("user_id", finalUserId)
-    .single();
+  .from("liked_posts")
+  .select("*")
+  .eq("post_id", post.id)
+  .eq("user_id", finalUserId)
+  .maybeSingle();
 
   if (existingLike) {
     alert("Already liked!");
@@ -430,7 +430,7 @@ if (!user) {
     .eq("id", post.id);
 
   getPosts();
-  
+
 }}
 
 
