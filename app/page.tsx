@@ -385,11 +385,12 @@ if (!user) {
   const liked = localStorage.getItem(`liked-${post.id}`);
 
   if (liked) {
-
+    
     alert("Already liked!");
     return;
 
   }
+
 
   await supabase
     .from("posts")
