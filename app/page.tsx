@@ -71,6 +71,16 @@ async function uploadPost() {
     .getPublicUrl(fileName);
 
   const imageUrl = data.publicUrl;
+  const {
+  data: { user },
+} = await supabase.auth.getUser();
+
+console.log(user);
+
+if (!user) {
+  alert("You are not logged in");
+  return;
+}
 
   const { error } = await supabase
     .from("posts")
