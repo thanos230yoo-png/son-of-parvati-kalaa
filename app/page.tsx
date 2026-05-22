@@ -240,6 +240,7 @@ if (updateError) {
   console.error(updateError);
   return;
 }
+await getPosts();
 
   if (updateError) {
 
