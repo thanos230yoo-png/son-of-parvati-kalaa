@@ -156,28 +156,104 @@ if (!user) {
   );
 
   async function handleLike(id: any): Promise<void> {
-    const post = posts.find((item) => item.id === id);
-    if (!post) return;
 
-    const newLikes = (post.likes || 0) + 1;
+  const post = posts.find((item) => item.id === id);
 
-    const { error } = await supabase
-      .from("posts")
-      .update({ likes: newLikes })
-      .eq("id", id);
+  if (!post) return;
 
-    if (error) {
-      console.error(error);
-      alert("Unable to like kalaa. Please try again.");
-      return;
-    }
+  // CREATE USER ID IF NOT EXIST
 
-    setPosts((current) =>
-      current.map((item) =>
-        item.id === id ? { ...item, likes: newLikes } : item
-      )
-    );
+  let userId = localStorage.getItem("user_id");
+
+  if (!userId) {
+
+    userId = crypto.randomUUID();
+
+    localStorage.setItem("user_id", userId);
+
   }
+
+  // CHECK DATABASE IF USER ALREADY LIKED
+
+  const { data: existingLike, error: checkError } = await supabase
+    .from("liked_posts")
+    .select("id")
+    .eq("post_id", id)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (checkError) {
+
+    console.log(checkError);
+
+    alert("Unable to verify like.");
+
+    return;
+
+  }
+
+  // IF ALREADY LIKED
+
+  if (existingLike) {
+
+    alert("Already liked!");
+
+    return;
+
+  }
+
+  // INSERT LIKE RECORD
+
+  const { error: insertError } = await supabase
+    .from("liked_posts")
+    .insert([
+      {
+        post_id: id,
+        user_id: userId,
+      },
+    ]);
+
+  if (insertError) {
+
+    console.log(insertError);
+
+    alert("Unable to save like.");
+
+    return;
+
+  }
+
+  // UPDATE LIKE COUNT
+
+  const newLikes = (post.likes || 0) + 1;
+
+  const { error: updateError } = await supabase
+    .from("posts")
+    .update({
+      likes: newLikes,
+    })
+    .eq("id", id);
+
+  if (updateError) {
+
+    console.log(updateError);
+
+    alert("Unable to update likes.");
+
+    return;
+
+  }
+
+  // UPDATE UI
+
+  setPosts((current) =>
+    current.map((item) =>
+      item.id === id
+        ? { ...item, likes: newLikes }
+        : item
+    )
+  );
+}
 
   return (
 
@@ -407,7 +483,7 @@ if (!user) {
 
                   {/* LIKE */}
 
-                  <button
+                 <button
   onClick={() => handleLike(post.id)}
   className="bg-pink-700 hover:bg-pink-900 px-4 py-2 rounded-xl"
 >
