@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../lib/supabase";
+import { error } from "console";
 
 export default function AdminPage() {
 
@@ -50,6 +51,7 @@ export default function AdminPage() {
 
     setPosts(data || []);
   }
+  
 
   async function uploadPost() {
 
@@ -104,6 +106,8 @@ export default function AdminPage() {
 
       return;
     }
+    console.log(data);
+console.log(error);
 
     alert("Kalaa Uploaded 🔥");
 
