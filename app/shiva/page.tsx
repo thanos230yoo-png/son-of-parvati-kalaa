@@ -74,10 +74,10 @@ checkAdmin();
           >
 
             <img
-              src={post.image}
-              alt={post.title}
-              className="w-full h-[500px] object-cover hover:scale-105 transition duration-300"
-            />
+  src={post.image}
+  alt={post.title}
+  className="w-full max-h-[800px] object-contain bg-black"
+/>
 
             <div className="p-5">
 

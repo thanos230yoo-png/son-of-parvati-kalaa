@@ -356,14 +356,18 @@ if (!user) {
 
             <div
               key={post.id}
-              className="bg-zinc-900 rounded-3xl overflow-hidden"
+              className="bg-zinc-900 rounded-3xl overflow-hidden flex flex-col"
             >
+              <a
+    href={post.image}
+    target="_blank"
+  ></a>
 
               <img
-                src={post.image}
-                alt={post.title}
-                className="w-full aspect-square object-cover"
-              />
+  src={post.image}
+  alt={post.title}
+  className="w-full max-h-[800px] object-contain bg-black"
+/>
 
               <div className="p-5">
 

@@ -87,10 +87,10 @@ async function deletePost(id: number) {
   >
 
     <img
-      src={post.image}
-      alt={post.title}
-      className="w-full h-[500px] object-cover"
-    />
+  src={post.image}
+  alt={post.title}
+  className="w-full max-h-[800px] object-contain bg-black"
+/>
 
     <div className="p-5">
 
