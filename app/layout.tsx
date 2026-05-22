@@ -22,14 +22,19 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <meta
+          name="p:domain_verify"
+          content="8590f2f69cfa342f22e3e663acc8f66"
+        />
+      </head>
+
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
