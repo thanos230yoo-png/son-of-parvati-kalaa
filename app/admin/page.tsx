@@ -48,10 +48,15 @@ export default function AdminPage() {
   const { data, error } = await supabase
     .from("posts")
     .select("*")
-    .order("id", { ascending: false });
+    .order("created_at", { ascending: false });
 
   console.log("POSTS:", data);
   console.log("ERROR:", error);
+
+  if (error) {
+    console.log(error);
+    return;
+  }
 
   setPosts(data || []);
 }
@@ -121,6 +126,55 @@ export default function AdminPage() {
 
     getPosts();
   }
+  <div className="mt-20">
+
+  <h2 className="text-5xl font-bold text-center text-purple-500 mb-10">
+    Uploaded Kalaa
+  </h2>
+
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    
+    {posts.map((post) => (
+      <div
+        key={post.id}
+        className="bg-black/60 border border-purple-900 rounded-3xl overflow-hidden"
+      >
+
+        <img
+          src={post.image}
+          alt={post.title}
+          className="w-full h-56 object-cover"
+        />
+
+        <div className="p-4">
+
+          <h3 className="text-2xl font-bold text-white mb-2">
+            {post.title}
+          </h3>
+
+          <p className="text-gray-400 mb-4">
+            {post.category}
+          </p>
+
+          <div className="flex gap-3">
+
+            <button
+              onClick={() => deletePost(post.id)}
+              className="bg-red-700 hover:bg-red-800 px-4 py-2 rounded-xl text-white font-bold"
+            >
+              Delete
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+    ))}
+
+  </div>
+
+</div>
 
   async function deletePost(id: number) {
 
