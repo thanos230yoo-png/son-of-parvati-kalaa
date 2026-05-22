@@ -389,17 +389,17 @@ if (!user) {
   const liked = localStorage.getItem(`liked-${post.id}`);
 
   if (liked) {
-    
+
     alert("Already liked!");
     return;
 
   }
-
+  
 
   await supabase
     .from("posts")
     .update({
-      likes: (post.likes || 0) + 1
+      likes: Number(post.likes || 0) + 1
     })
     .eq("id", post.id);
 
