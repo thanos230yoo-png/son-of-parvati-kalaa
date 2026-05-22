@@ -227,12 +227,19 @@ if (!user) {
 
   const newLikes = (post.likes || 0) + 1;
 
-  const { error: updateError } = await supabase
-    .from("posts")
-    .update({
-      likes: newLikes,
-    })
-    .eq("id", id);
+  const newLikeCount = (post.likes || 0) + 1;
+
+const { error: updateError } = await supabase
+  .from("posts")
+  .update({
+    likes: newLikeCount,
+  })
+  .eq("id", post.id);
+
+if (updateError) {
+  console.error(updateError);
+  return;
+}
 
   if (updateError) {
 
