@@ -156,7 +156,7 @@ async function deletePost(id: number) {
     .eq("id", post.id);
 
   getPosts();
-  
+
 }}
   className="bg-pink-700 hover:bg-pink-900 px-4 py-2 rounded-xl"
 >

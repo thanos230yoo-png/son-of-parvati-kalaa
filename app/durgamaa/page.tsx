@@ -5,31 +5,17 @@ import { supabase } from "../lib/supabase";
 
 export default function DurgaMaaPage() {
   const [isAdmin, setIsAdmin] = useState(false);
-
-async function checkAdmin() {
-
-  const { data } = await supabase.auth.getUser();
-
-  if (data.user) {
-
-    setIsAdmin(true);
-
-  }
-}
-
   const [posts, setPosts] = useState<any[]>([]);
-  
 
-  useEffect(() => {
+  async function checkAdmin() {
+    const { data } = await supabase.auth.getUser();
 
-  getPosts();
-
-  checkAdmin();
-
-}, []);
+    if (data.user) {
+      setIsAdmin(true);
+    }
+  }
 
   async function getPosts() {
-
     const { data } = await supabase
       .from("posts")
       .select("*")
@@ -38,8 +24,63 @@ async function checkAdmin() {
     setPosts(data || []);
   }
 
-  async function deletePost(id: number) {
+  async function handleLike(post: any) {
+    let userId = localStorage.getItem("user_id");
 
+    if (!userId) {
+      userId = crypto.randomUUID();
+      localStorage.setItem("user_id", userId);
+    }
+
+    // CHECK IF ALREADY LIKED
+
+    const { data: existingLike } = await supabase
+      .from("liked_posts")
+      .select("*")
+      .eq("post_id", post.id)
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (existingLike) {
+      alert("Already liked!");
+      return;
+    }
+
+    // INSERT LIKE
+
+    const { error: insertError } = await supabase
+      .from("liked_posts")
+      .insert([
+        {
+          post_id: post.id,
+          user_id: userId,
+        },
+      ]);
+
+    if (insertError) {
+      console.log(insertError);
+      alert("Like failed");
+      return;
+    }
+
+    // UPDATE POST LIKE COUNT
+
+    const { error: updateError } = await supabase
+      .from("posts")
+      .update({
+        likes: (post.likes || 0) + 1,
+      })
+      .eq("id", post.id);
+
+    if (updateError) {
+      console.log(updateError);
+      return;
+    }
+
+    getPosts();
+  }
+
+  async function deletePost(id: number) {
     await supabase
       .from("posts")
       .delete()
@@ -48,14 +89,17 @@ async function checkAdmin() {
     getPosts();
   }
 
+  useEffect(() => {
+    getPosts();
+    checkAdmin();
+  }, []);
+
   return (
-
     <main className="min-h-screen bg-black text-white p-10">
-
       {/* BACK BUTTON */}
 
       <button
-        onClick={() => window.location.href = "/"}
+        onClick={() => (window.location.href = "/")}
         className="fixed top-6 left-6 z-50 bg-zinc-900 px-4 py-2 rounded-full border border-red-700 hover:bg-red-700 transition"
       >
         ← Back
@@ -67,42 +111,48 @@ async function checkAdmin() {
         Durga Maa Kalaa
       </h1>
 
-      
-
-      {/* EMPTY MESSAGE */}
+      {/* EMPTY */}
 
       {posts.length === 0 && (
-
         <p className="text-center text-zinc-500 text-2xl mb-10">
           No uploaded kalaa yet...
         </p>
-
       )}
 
       {/* GALLERY */}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
-
         {posts.map((post) => (
-
           <div
             key={post.id}
             className="bg-zinc-900 rounded-3xl overflow-hidden shadow-2xl"
           >
+            {/* CLICKABLE IMAGE */}
 
-            <img
-  src={post.image}
-  alt={post.title}
-  className="w-full max-h-[800px] object-contain bg-black"
-/>
+            <a href={post.image} target="_blank">
+              <img
+                src={post.image}
+                alt={post.title}
+                className="w-full max-h-[800px] object-contain bg-black hover:scale-105 transition duration-300"
+              />
+            </a>
 
             <div className="p-5">
-
               <h2 className="text-2xl font-bold">
                 {post.title}
               </h2>
 
-              <div className="flex gap-3 mt-4">
+              <div className="flex gap-3 mt-4 flex-wrap">
+                {/* LIKE */}
+
+                <button
+                  onClick={() => handleLike(post)}
+                  className="bg-pink-700 hover:bg-pink-900 px-4 py-2 rounded-xl"
+                >
+                  ❤️ {post.likes || 0}
+                </button>
+
+                {/* DOWNLOAD */}
 
                 <a
                   href={post.image}
@@ -112,92 +162,22 @@ async function checkAdmin() {
                 >
                   Download
                 </a>
-               <button
-  onClick={async () => {
 
-  const userId = localStorage.getItem("user_id");
-
-  if (!userId) {
-    const newId = crypto.randomUUID();
-    localStorage.setItem("user_id", newId);
-  }
-
-  const finalUserId = localStorage.getItem("user_id");
-
-  // CHECK IF ALREADY LIKED
-
-  const { data: existingLike } = await supabase
-    .from("liked_posts")
-    .select("*")
-    .eq("post_id", post.id)
-    .eq("user_id", finalUserId)
-    .single();
-
-  if (existingLike) {
-    alert("Already liked!");
-    return;
-  }
-
-  // ADD LIKE RECORD
-
-  await supabase
-    .from("liked_posts")
-    .insert([
-      {
-        post_id: post.id,
-        user_id: finalUserId,
-      },
-    ]);
-
-  // UPDATE POST LIKE COUNT
-
-  await supabase
-    .from("posts")
-    .update({
-      likes: (post.likes || 0) + 1,
-    })
-    .eq("id", post.id);
-
-  getPosts();
-  
-}}
-
-  className="bg-pink-700 hover:bg-pink-900 px-4 py-2 rounded-xl"
->
-  ❤️ {post.likes || 0}
-</button>
+                {/* DELETE */}
 
                 {isAdmin && (
-
-  <button
-    onClick={async () => {
-
-      await supabase
-        .from("posts")
-        .delete()
-        .eq("id", post.id);
-
-      getPosts();
-
-    }}
-    className="bg-red-700 hover:bg-red-900 px-4 py-2 rounded-xl"
-  >
-    Delete
-  </button>
-
-)}
-
+                  <button
+                    onClick={() => deletePost(post.id)}
+                    className="bg-red-700 hover:bg-red-900 px-4 py-2 rounded-xl"
+                  >
+                    Delete
+                  </button>
+                )}
               </div>
-
             </div>
-
           </div>
-
         ))}
-
       </div>
-
     </main>
-
   );
 }
