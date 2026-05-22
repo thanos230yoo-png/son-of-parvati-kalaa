@@ -3,13 +3,42 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
+
 export default function KaliMaaPage() {
+  
 
   const [posts, setPosts] = useState<any[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     getPosts();
+    checkAdmin();
   }, []);
+   async function checkAdmin() {
+
+  const { data } = await supabase.auth.getUser();
+
+  const email = data.user?.email;
+
+  if (email === "thanos230yoo@gmail.com") {
+    setIsAdmin(true);
+  }
+
+}
+async function deletePost(id: number) {
+
+  const confirmDelete = confirm("Delete this kalaa?");
+
+  if (!confirmDelete) return;
+
+  await supabase
+    .from("posts")
+    .delete()
+    .eq("id", id);
+
+  getPosts();
+
+}
 
   async function getPosts() {
 
@@ -20,6 +49,7 @@ export default function KaliMaaPage() {
 
     setPosts(data || []);
   }
+
 
   return (
 
@@ -93,21 +123,16 @@ export default function KaliMaaPage() {
           ❤️ {post.likes || 0}
         </button>
 
-        <button
-          onClick={async () => {
+        {isAdmin && (
 
-            await supabase
-              .from("posts")
-              .delete()
-              .eq("id", post.id);
+  <button
+    onClick={() => deletePost(post.id)}
+    className="bg-red-700 hover:bg-red-900 px-4 py-2 rounded-xl"
+  >
+    Delete
+  </button>
 
-            getPosts();
-
-          }}
-          className="bg-red-700 hover:bg-red-900 px-4 py-2 rounded-xl"
-        >
-          Delete
-        </button>
+)}
 
       </div>
 
