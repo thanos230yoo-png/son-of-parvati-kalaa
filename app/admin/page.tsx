@@ -21,26 +21,27 @@ export default function AdminPage() {
   useEffect(() => {
 
     checkAdmin();
-
-    getPosts();
+    
 
   }, []);
 
   async function checkAdmin() {
 
-    const { data } = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getUser();
 
-    if (
-      data.user?.email !== "thanos230yoo@gmail.com"
-    ) {
+  if (
+    data.user?.email !== "thanos230yoo@gmail.com"
+  ) {
 
-      router.push("/");
+    router.push("/");
 
-      return;
-    }
-
-    setLoading(false);
+    return;
   }
+
+  await getPosts();
+
+  setLoading(false);
+}
 
   async function getPosts() {
 
