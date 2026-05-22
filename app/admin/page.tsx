@@ -44,13 +44,16 @@ export default function AdminPage() {
 
   async function getPosts() {
 
-    const { data } = await supabase
-      .from("posts")
-      .select("*")
-      .order("id", { ascending: false });
+  const { data, error } = await supabase
+    .from("posts")
+    .select("*")
+    .order("id", { ascending: false });
 
-    setPosts(data || []);
-  }
+  console.log("POSTS:", data);
+  console.log("ERROR:", error);
+
+  setPosts(data || []);
+}
   
 
   async function uploadPost() {
@@ -106,8 +109,7 @@ export default function AdminPage() {
 
       return;
     }
-    console.log(data);
-console.log(error);
+
 
     alert("Kalaa Uploaded 🔥");
 
