@@ -14,9 +14,17 @@ export default function Home() {
   const [tags, setTags] = useState("");
   const [image, setImage] = useState<any>(null);
 
+  useEffect(() => {
+
+    getPosts();
+    checkAdmin();
+
+  }, []);
+
   async function checkAdmin() {
 
     const { data } = await supabase.auth.getUser();
+
     if (data.user?.email === "thanos230yoo@gmail.com") {
 
       setIsAdmin(true);
@@ -36,96 +44,167 @@ export default function Home() {
 
   async function deletePost(id: number) {
 
-  await supabase
-    .from("posts")
-    .delete()
-    .eq("id", id);
-
-  getPosts();
-}
-
-async function uploadPost() {
-
-  if (!image) {
-    alert("Choose image first");
-    return;
-  }
-
-  const fileName = `${Date.now()}-${image.name}`;
-
-  const { error: imageError } = await supabase.storage
-    .from("kalaa")
-    .upload(fileName, image);
-
-  if (imageError) {
-
-    console.log(imageError);
-
-    alert("Image upload failed");
-
-    return;
-  }
-
-  const { data } = supabase.storage
-    .from("kalaa")
-    .getPublicUrl(fileName);
-
-  const imageUrl = data.publicUrl;
-  const {
-  data: { user },
-} = await supabase.auth.getUser();
-
-console.log(user);
-
-if (!user) {
-  alert("You are not logged in");
-  return;
-}
-
-  const { error } = await supabase
-    .from("posts")
-    .insert([
-      {
-        title,
-        image: imageUrl,
-        category,
-        tags: tags || "",
-        likes: 0,
-      }
-    ]);
-
-   if (error) {
-
-     console.log(error);
-
-     alert(error.message);
-
-   }
-
-  else {
-
-    alert("Kalaa Uploaded 🔥");
+    await supabase
+      .from("posts")
+      .delete()
+      .eq("id", id);
 
     getPosts();
-
   }
-}
 
-  useEffect(() => {
+  async function uploadPost() {
 
-  getPosts();
+    if (!image) {
 
-  const loadAdmin = async () => {
+      alert("Choose image first");
+      return;
+    }
 
-    await supabase.auth.getSession();
+    const fileName = `${Date.now()}-${image.name}`;
 
-    checkAdmin();
+    const { error: imageError } = await supabase.storage
+      .from("kalaa")
+      .upload(fileName, image);
 
-  };
+    if (imageError) {
 
-  loadAdmin();
+      console.log(imageError);
 
-}, []);
+      alert("Image upload failed");
+
+      return;
+    }
+
+    const { data } = supabase.storage
+      .from("kalaa")
+      .getPublicUrl(fileName);
+
+    const imageUrl = data.publicUrl;
+
+    const { error } = await supabase
+      .from("posts")
+      .insert([
+        {
+          title,
+          image: imageUrl,
+          category,
+          tags: tags || "",
+          likes: 0,
+        }
+      ]);
+
+    if (error) {
+
+      console.log(error);
+
+      alert(error.message);
+
+    } else {
+
+      alert("Kalaa Uploaded 🔥");
+
+      setTitle("");
+      setCategory("");
+      setTags("");
+      setImage(null);
+
+      getPosts();
+    }
+  }
+
+  async function handleLike(id: number): Promise<void> {
+
+    const post = posts.find((item) => item.id === id);
+
+    if (!post) return;
+
+    // UNIQUE USER ID
+
+    let userId = localStorage.getItem("user_id");
+
+    if (
+      !userId ||
+      userId === "null" ||
+      userId === "undefined"
+    ) {
+
+      userId = crypto.randomUUID();
+
+      localStorage.setItem("user_id", userId);
+    }
+
+    // CHECK EXISTING LIKE
+
+    const { data: existingLike, error: checkError } =
+      await supabase
+        .from("liked_posts")
+        .select("id")
+        .eq("post_id", id)
+        .eq("user_id", userId)
+        .maybeSingle();
+
+    if (checkError) {
+
+      console.log(checkError);
+
+      alert("Unable to verify like.");
+
+      return;
+    }
+
+    // ALREADY LIKED
+
+    if (existingLike) {
+
+      alert("Already liked!");
+
+      return;
+    }
+
+    // INSERT LIKE RECORD
+
+    const { error: insertError } = await supabase
+      .from("liked_posts")
+      .insert([
+        {
+          post_id: id,
+          user_id: userId,
+        },
+      ]);
+
+    if (insertError) {
+
+      console.log(insertError);
+
+      alert("Unable to save like.");
+
+      return;
+    }
+
+    // UPDATE COUNT
+
+    const newLikeCount = (post.likes || 0) + 1;
+
+    const { error: updateError } = await supabase
+      .from("posts")
+      .update({
+        likes: newLikeCount,
+      })
+      .eq("id", id);
+
+    if (updateError) {
+
+      console.log(updateError);
+
+      alert("Unable to update likes.");
+
+      return;
+    }
+
+    // REFRESH POSTS
+
+    await getPosts();
+  }
 
   const kalaas = [
 
@@ -155,119 +234,9 @@ if (!user) {
     item.title.toLowerCase().includes(search.toLowerCase())
   );
 
-  async function handleLike(id: any): Promise<void> {
-
-  const post = posts.find((item) => item.id === id);
-
-  if (!post) return;
-
-  // CREATE USER ID IF NOT EXIST
-
-  let userId = localStorage.getItem("user_id");
-
-  if (!userId) {
-
-    userId = crypto.randomUUID();
-
-    localStorage.setItem("user_id", userId);
-
-  }
-
-  // CHECK DATABASE IF USER ALREADY LIKED
-
-  const { data: existingLike, error: checkError } = await supabase
-    .from("liked_posts")
-    .select("id")
-    .eq("post_id", id)
-    .eq("user_id", userId)
-    .maybeSingle();
-
-  if (checkError) {
-
-    console.log(checkError);
-
-    alert("Unable to verify like.");
-
-    return;
-
-  }
-
-  // IF ALREADY LIKED
-
-  if (existingLike) {
-
-    alert("Already liked!");
-
-    return;
-
-  }
-
-  // INSERT LIKE RECORD
-
-  const { error: insertError } = await supabase
-    .from("liked_posts")
-    .insert([
-      {
-        post_id: id,
-        user_id: userId,
-      },
-    ]);
-
-  if (insertError) {
-
-    console.log(insertError);
-
-    alert("Unable to save like.");
-
-    return;
-
-  }
-
-  // UPDATE LIKE COUNT
-
-  const newLikes = (post.likes || 0) + 1;
-
-  const newLikeCount = (post.likes || 0) + 1;
-
-const { error: updateError } = await supabase
-  .from("posts")
-  .update({
-    likes: newLikeCount,
-  })
-  .eq("id", post.id);
-
-if (updateError) {
-  console.error(updateError);
-  return;
-}
-await getPosts();
-
-  if (updateError) {
-
-    console.log(updateError);
-
-    alert("Unable to update likes.");
-
-    return;
-
-  }
-
-  // UPDATE UI
-
-  setPosts((current) =>
-    current.map((item) =>
-      item.id === id
-        ? { ...item, likes: newLikes }
-        : item
-    )
-  );
-}
-
   return (
 
     <main className="min-h-screen text-white relative overflow-x-hidden flex flex-col items-center">
-
-      {/* BACKGROUND */}
 
       <div className="fixed inset-0 -z-10">
 
@@ -278,10 +247,6 @@ await getPosts();
         />
 
       </div>
-
-      
-
-      {/* HEADER */}
 
       <div className="w-full text-center py-10">
 
@@ -295,53 +260,17 @@ await getPosts();
 
       </div>
 
-      {/* SEARCH */}
-
       <div className="flex items-center gap-3 mt-8">
 
         <input
           type="text"
-          placeholder="Search kalaa, edits, wallpapers..."
+          placeholder="Search kalaa..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-[600px] max-w-[90vw] bg-zinc-900 border border-red-800 rounded-full px-6 py-3 text-white outline-none"
         />
 
-        <button className="px-5 py-3 rounded-full bg-purple-700">
-          🔍
-        </button>
-
       </div>
-
-      {/* CATEGORIES */}
-
-      <div className="flex flex-wrap justify-center gap-4 mt-10 px-6">
-
-        {[
-          "Shiva",
-          "Kali",
-          "Krishna",
-          "Parvati",
-          "Bhairava",
-          "Aghora",
-          "Wallpapers",
-          "AMVs",
-          "Spiritual Edits",
-          "Cosmic"
-        ].map((item) => (
-
-          <button
-            key={item}
-            className="px-5 py-2 rounded-full bg-zinc-900 border border-purple-700 hover:border-red-500 transition"
-          >
-            {item}
-          </button>
-
-        ))}
-
-      </div>
-
-      {/* FEATURED KALAA */}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-20 w-[90%] max-w-6xl">
 
@@ -349,7 +278,7 @@ await getPosts();
 
           <div
             key={item.title}
-            className="bg-black/70 backdrop-blur-sm border border-zinc-800 rounded-3xl overflow-hidden hover:border-purple-500 transition"
+            className="bg-black/70 backdrop-blur-sm border border-zinc-800 rounded-3xl overflow-hidden"
           >
 
             <img
@@ -368,20 +297,10 @@ await getPosts();
 
                 <Link
                   href={`/${item.title.toLowerCase().replace(" ", "")}`}
-                  className="px-5 py-2 rounded-full bg-purple-700 hover:bg-red-600 transition"
+                  className="px-5 py-2 rounded-full bg-purple-700"
                 >
                   View Kalaa
                 </Link>
-
-                {isAdmin && (
-
-                  <button
-                    className="bg-red-700 hover:bg-red-900 px-4 py-2 rounded-xl"
-                  >
-                    Delete
-                  </button>
-
-                )}
 
               </div>
 
@@ -392,65 +311,64 @@ await getPosts();
         ))}
 
       </div>
+
       {isAdmin && (
 
-  <div className="w-[90%] max-w-4xl bg-black/70 border border-purple-900 rounded-3xl p-8 mt-20">
+        <div className="w-[90%] max-w-4xl bg-black/70 border border-purple-900 rounded-3xl p-8 mt-20">
 
-    <h1 className="text-4xl font-black text-center mb-8 bg-gradient-to-r from-purple-500 to-red-500 text-transparent bg-clip-text">
-      Upload Kalaa
-    </h1>
+          <h1 className="text-4xl font-black text-center mb-8">
+            Upload Kalaa
+          </h1>
 
-    <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-6">
 
-      <input
-        type="text"
-        placeholder="Kalaa Title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        className="bg-zinc-900 p-4 rounded-xl outline-none"
-      />
+            <input
+              type="text"
+              placeholder="Kalaa Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="bg-zinc-900 p-4 rounded-xl"
+            />
 
-      <select
-        value={category}
-        onChange={(e) => setCategory(e.target.value)}
-        className="bg-zinc-900 p-4 rounded-xl outline-none"
-      >
-        <option value="">Choose Category</option>
-        <option value="Durga">Durga</option>
-        <option value="Kali">Kali</option>
-        <option value="Shiva">Shiva</option>
-        <option value="Krishna">Krishna</option>
-        <option value="General">General</option>
-      </select>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="bg-zinc-900 p-4 rounded-xl"
+            >
+              <option value="">Choose Category</option>
+              <option value="Durga">Durga</option>
+              <option value="Kali">Kali</option>
+              <option value="Shiva">Shiva</option>
+              <option value="Krishna">Krishna</option>
+              <option value="General">General</option>
+            </select>
 
-      <input
-        type="text"
-        placeholder="Search Tags"
-        value={tags}
-        onChange={(e) => setTags(e.target.value)}
-        className="bg-zinc-900 p-4 rounded-xl outline-none"
-      />
+            <input
+              type="text"
+              placeholder="Tags"
+              value={tags}
+              onChange={(e) => setTags(e.target.value)}
+              className="bg-zinc-900 p-4 rounded-xl"
+            />
 
-      <input
-        type="file"
-        onChange={(e) => setImage(e.target.files?.[0] || null)}
-        className="bg-zinc-900 p-4 rounded-xl"
-      />
+            <input
+              type="file"
+              onChange={(e) => setImage(e.target.files?.[0] || null)}
+              className="bg-zinc-900 p-4 rounded-xl"
+            />
 
-      <button
-        onClick={uploadPost}
-        className="bg-purple-700 hover:bg-red-700 transition py-4 rounded-xl font-bold"
-      >
-        Upload Kalaa
-      </button>
+            <button
+              onClick={uploadPost}
+              className="bg-purple-700 py-4 rounded-xl font-bold"
+            >
+              Upload Kalaa
+            </button>
 
-    </div>
+          </div>
 
-  </div>
+        </div>
 
-)}
-
-      {/* UPLOADED KALAA */}
+      )}
 
       <div className="mt-20 w-[90%] max-w-6xl">
 
@@ -466,16 +384,19 @@ await getPosts();
               key={post.id}
               className="bg-zinc-900 rounded-3xl overflow-hidden break-inside-avoid mb-8"
             >
-              <a
-    href={post.image}
-    target="_blank"
-  ></a>
 
-              <img
-  src={post.image}
-  alt={post.title}
-  className="w-full max-h-[800px] object-contain bg-black"
-/>
+              <a
+                href={post.image}
+                target="_blank"
+              >
+
+                <img
+                  src={post.image}
+                  alt={post.title}
+                  className="w-full max-h-[800px] object-contain bg-black"
+                />
+
+              </a>
 
               <div className="p-5">
 
@@ -489,33 +410,26 @@ await getPosts();
 
                 <div className="flex gap-4 mt-4 flex-wrap">
 
-                  {/* LIKE */}
-
-                 <button
-  onClick={() => handleLike(post.id)}
-  className="bg-pink-700 hover:bg-pink-900 px-4 py-2 rounded-xl"
->
-  ❤️ {post.likes || 0}
-</button>
-
-                  {/* DOWNLOAD */}
+                  <button
+                    onClick={() => handleLike(post.id)}
+                    className="bg-pink-700 hover:bg-pink-900 px-4 py-2 rounded-xl"
+                  >
+                    ❤️ {post.likes || 0}
+                  </button>
 
                   <a
                     href={post.image}
                     download
-                    className="bg-purple-700 hover:bg-red-700 px-4 py-2 rounded-xl"
+                    className="bg-purple-700 px-4 py-2 rounded-xl"
                   >
                     Download
                   </a>
-
-                  {/* DELETE */}
-                  
 
                   {isAdmin && (
 
                     <button
                       onClick={() => deletePost(post.id)}
-                      className="bg-red-700 hover:bg-red-900 px-4 py-2 rounded-xl"
+                      className="bg-red-700 px-4 py-2 rounded-xl"
                     >
                       Delete
                     </button>
@@ -534,13 +448,10 @@ await getPosts();
 
       </div>
 
-      {/* FOOTER */}
-
       <div className="py-20 text-zinc-500 text-sm">
         Son Of Parvati • Kalaa Archive
       </div>
 
     </main>
-
   );
 }
