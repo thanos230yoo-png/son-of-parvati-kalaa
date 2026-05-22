@@ -96,20 +96,22 @@ checkAdmin();
               <button
   onClick={async () => {
 
-  const { data: userData } = await supabase.auth.getUser();
+  const userId = localStorage.getItem("user_id");
 
-  const email = userData.user?.email;
-
-  if (!email) {
-    alert("Login first");
-    return;
+  if (!userId) {
+    const newId = crypto.randomUUID();
+    localStorage.setItem("user_id", newId);
   }
+
+  const finalUserId = localStorage.getItem("user_id");
+
+  // CHECK IF ALREADY LIKED
 
   const { data: existingLike } = await supabase
     .from("liked_posts")
     .select("*")
     .eq("post_id", post.id)
-    .eq("user_email", email)
+    .eq("user_id", finalUserId)
     .single();
 
   if (existingLike) {
@@ -117,25 +119,30 @@ checkAdmin();
     return;
   }
 
-  await supabase
-    .from("posts")
-    .update({
-      likes: Number(post.likes || 0) + 1
-    })
-    .eq("id", post.id);
+  // ADD LIKE RECORD
 
   await supabase
     .from("liked_posts")
     .insert([
       {
         post_id: post.id,
-        user_email: email
-      }
+        user_id: finalUserId,
+      },
     ]);
+
+  // UPDATE POST LIKE COUNT
+
+  await supabase
+    .from("posts")
+    .update({
+      likes: (post.likes || 0) + 1,
+    })
+    .eq("id", post.id);
 
   getPosts();
 
 }}
+
   className="bg-pink-700 hover:bg-pink-900 px-4 py-2 rounded-xl"
 >
   ❤️ {post.likes || 0}
