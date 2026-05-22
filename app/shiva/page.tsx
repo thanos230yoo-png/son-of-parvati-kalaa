@@ -96,9 +96,23 @@ checkAdmin();
               <button
   onClick={async () => {
 
-  const liked = localStorage.getItem(`liked-${post.id}`);
+  const { data: userData } = await supabase.auth.getUser();
 
-  if (liked) {
+  const email = userData.user?.email;
+
+  if (!email) {
+    alert("Login first");
+    return;
+  }
+
+  const { data: existingLike } = await supabase
+    .from("liked_posts")
+    .select("*")
+    .eq("post_id", post.id)
+    .eq("user_email", email)
+    .single();
+
+  if (existingLike) {
     alert("Already liked!");
     return;
   }
@@ -110,7 +124,14 @@ checkAdmin();
     })
     .eq("id", post.id);
 
-  localStorage.setItem(`liked-${post.id}`, "true");
+  await supabase
+    .from("liked_posts")
+    .insert([
+      {
+        post_id: post.id,
+        user_email: email
+      }
+    ]);
 
   getPosts();
 
