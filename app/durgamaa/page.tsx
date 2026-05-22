@@ -112,23 +112,32 @@ async function checkAdmin() {
                 >
                   Download
                 </a>
-                <button
-                  onClick={async () => {
+               <button
+  onClick={async () => {
 
-                    await supabase
-                      .from("posts")
-                      .update({
-                        likes: (post.likes || 0) + 1
-                    })
-                    .eq("id", post.id);
+    const liked = localStorage.getItem(`liked-${post.id}`);
 
-                     getPosts();
+    if (liked) {
+      alert("Already liked!");
+      return;
+    }
 
-                  }}
-                  className="bg-pink-700 hover:bg-pink-900 px-4 py-2 rounded-xl"
-                >
-                  ❤️ {post.likes || 0}
-                </button>
+    await supabase
+      .from("posts")
+      .update({
+        likes: (post.likes || 0) + 1
+      })
+      .eq("id", post.id);
+
+    localStorage.setItem(`liked-${post.id}`, "true");
+
+    getPosts();
+
+  }}
+  className="bg-pink-700 hover:bg-pink-900 px-4 py-2 rounded-xl"
+>
+  ❤️ {post.likes || 0}
+</button>
 
                 {isAdmin && (
 
