@@ -380,34 +380,31 @@ if (!user) {
                   {/* LIKE */}
 
                   <button
-                    onClick={async () => {
+  onClick={async () => {
 
-  const liked = localStorage.getItem(`liked-${post.id}`);
+    const liked = localStorage.getItem(`liked-${post.id}`);
 
-  if (liked) {
-    
-    alert("Already liked!");
-    return;
+    if (liked) {
+      alert("Already liked!");
+      return;
+    }
 
-  }
+    await supabase
+      .from("posts")
+      .update({
+        likes: (post.likes || 0) + 1
+      })
+      .eq("id", post.id);
 
+    localStorage.setItem(`liked-${post.id}`, "true");
 
-  await supabase
-    .from("posts")
-    .update({
-      likes: (post.likes || 0) + 1
-    })
-    .eq("id", post.id);
+    getPosts();
 
-  localStorage.setItem(`liked-${post.id}`, "true");
-
-  getPosts();
-
-}}
-                    className="bg-pink-700 hover:bg-pink-900 px-4 py-2 rounded-xl"
-                  >
-                    ❤️ {post.likes || 0}
-                  </button>
+  }}
+  className="bg-pink-700 hover:bg-pink-900 px-4 py-2 rounded-xl"
+>
+  ❤️ {post.likes || 0}
+</button>
 
                   {/* DOWNLOAD */}
 
