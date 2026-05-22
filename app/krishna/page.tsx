@@ -6,9 +6,11 @@ import { supabase } from "../lib/supabase";
 export default function KrishnaPage() {
 
   const [posts, setPosts] = useState<any[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     getPosts();
+    checkAdmin();
   }, []);
 
   async function getPosts() {
@@ -20,6 +22,33 @@ export default function KrishnaPage() {
 
     setPosts(data || []);
   }
+  async function checkAdmin() {
+
+  const { data } = await supabase.auth.getUser();
+
+  const email = data.user?.email;
+
+  if (email === "thanos230yoo@gmail.com") {
+    setIsAdmin(true);
+  }
+
+}
+async function deletePost(id: number) {
+
+  const confirmDelete = confirm("Delete this kalaa?");
+
+  if (!confirmDelete) return;
+
+  await supabase
+    .from("posts")
+    .delete()
+    .eq("id", id);
+
+  getPosts();
+
+}
+
+checkAdmin();
 
   return (
     <main className="min-h-screen bg-black text-white p-10">
@@ -64,6 +93,42 @@ export default function KrishnaPage() {
               >
                 Download
               </a>
+              <button
+  onClick={async () => {
+
+    const liked = localStorage.getItem(`liked-${post.id}`);
+
+    if (liked) {
+      alert("Already liked!");
+      return;
+    }
+
+    await supabase
+      .from("posts")
+      .update({
+        likes: (post.likes || 0) + 1
+      })
+      .eq("id", post.id);
+
+    localStorage.setItem(`liked-${post.id}`, "true");
+
+    getPosts();
+
+  }}
+  className="bg-pink-700 hover:bg-pink-900 px-4 py-2 rounded-xl"
+>
+  ❤️ {post.likes || 0}
+</button>
+{isAdmin && (
+
+  <button
+    onClick={() => deletePost(post.id)}
+    className="bg-red-700 hover:bg-red-900 px-4 py-2 rounded-xl"
+  >
+    Delete
+  </button>
+
+)}
 
             </div>
 
