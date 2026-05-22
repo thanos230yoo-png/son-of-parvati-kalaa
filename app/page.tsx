@@ -350,13 +350,13 @@ if (!user) {
           Uploaded Kalaa
         </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
 
           {posts.map((post) => (
 
             <div
               key={post.id}
-              className="bg-zinc-900 rounded-3xl overflow-hidden flex flex-col"
+              className="bg-zinc-900 rounded-3xl overflow-hidden break-inside-avoid mb-8"
             >
               <a
     href={post.image}
