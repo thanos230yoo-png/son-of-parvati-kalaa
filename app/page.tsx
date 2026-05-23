@@ -43,6 +43,28 @@ export default function Home() {
 
     setPosts(data || []);
   }
+  async function updatePost(id: number, newTitle: string) {
+
+  const { error } = await supabase
+    .from("posts")
+    .update({
+      title: newTitle,
+    })
+    .eq("id", id);
+
+  if (error) {
+
+    console.log(error);
+
+    alert("Unable to update");
+
+    return;
+  }
+
+  alert("Updated 🔥");
+
+  getPosts();
+}
 
   async function deletePost(id: number) {
 
@@ -391,7 +413,21 @@ export default function Home() {
                       className="bg-red-700 px-4 py-2 rounded-xl"
                     >
                       Delete
+                      <button
+  onClick={() => {
+
+    const newTitle = prompt("New title", post.title);
+
+    if (!newTitle) return;
+
+    updatePost(post.id, newTitle);
+  }}
+  className="bg-blue-700 hover:bg-blue-900 px-4 py-2 rounded-xl"
+>
+  Edit
+</button>
                     </button>
+                    
 
                   )}
 
