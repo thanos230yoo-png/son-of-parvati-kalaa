@@ -304,64 +304,7 @@ if (alreadyLiked) {
 
       </div>
 
-      {isAdmin && (
-
-        <div className="w-[90%] max-w-4xl bg-black/70 border border-purple-900 rounded-3xl p-8 mt-20">
-
-          <h1 className="text-4xl font-black text-center mb-8">
-            Upload Kalaa
-          </h1>
-
-          <div className="flex flex-col gap-6">
-
-            <input
-              type="text"
-              placeholder="Kalaa Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="bg-zinc-900 p-4 rounded-xl"
-            />
-
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="bg-zinc-900 p-4 rounded-xl"
-            >
-              <option value="">Choose Category</option>
-              <option value="Durga">Durga</option>
-              <option value="Kali">Kali</option>
-              <option value="Shiva">Shiva</option>
-              <option value="Krishna">Krishna</option>
-              <option value="General">General</option>
-            </select>
-
-            <input
-              type="text"
-              placeholder="Tags"
-              value={tags}
-              onChange={(e) => setTags(e.target.value)}
-              className="bg-zinc-900 p-4 rounded-xl"
-            />
-
-            <input
-              type="file"
-              onChange={(e) => setImage(e.target.files?.[0] || null)}
-              className="bg-zinc-900 p-4 rounded-xl"
-            />
-
-            <button
-              onClick={uploadPost}
-              className="bg-purple-700 py-4 rounded-xl font-bold"
-            >
-              Upload Kalaa
-            </button>
-
-          </div>
-
-        </div>
-
-      )}
-
+      
       <div className="mt-20 w-[90%] max-w-6xl">
 
         <h1 className="text-4xl font-bold text-center mb-10 text-purple-500">
