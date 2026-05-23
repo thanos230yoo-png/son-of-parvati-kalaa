@@ -217,15 +217,19 @@ export default function Home() {
 
       <form
   onSubmit={(e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const results = posts.filter((post) =>
-    post.title.toLowerCase().includes(search.toLowerCase())
-  );
+    const results = posts.filter((post) =>
+      post.title.toLowerCase().includes(search.toLowerCase())
+    );
 
-  setFilteredPosts(results);
-}}
-  className="flex items-center gap-3 mt-8 w-full justify-center"
+    setFilteredPosts(results);
+
+    document
+      .getElementById("uploaded-kalaa")
+      ?.scrollIntoView({ behavior: "smooth" });
+  }}
+  className="flex items-center justify-center gap-3 mt-10 mb-20"
 >
 
   <input
@@ -233,65 +237,70 @@ export default function Home() {
     placeholder="Search kalaa..."
     value={search}
     onChange={(e) => setSearch(e.target.value)}
-    className="w-[600px] max-w-[90vw] bg-zinc-900 border border-red-800 rounded-full px-6 py-3 text-white outline-none"
+    className="w-[600px] max-w-[90vw] bg-[#111] border border-red-900 text-white px-6 py-4 rounded-full outline-none"
   />
 
   <button
     type="submit"
-    className="bg-pink-700 hover:bg-pink-900 px-5 py-3 rounded-full"
+    className="bg-pink-700 hover:bg-pink-800 w-14 h-14 rounded-full text-white text-xl"
   >
     🔍
   </button>
 
 </form>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-20 w-[90%] max-w-6xl">
+      {!search && (
 
-        {(search ? filteredKalaas : kalaas).map((item) => (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 w-[90%] mx-auto">
 
-          <div
-            key={item.title}
-            className="bg-black/70 backdrop-blur-sm border border-zinc-800 rounded-3xl overflow-hidden"
-          >
+    {filteredKalaas.map((item) => (
 
-            <img
-              src={item.image}
-              alt={item.title}
-              className="w-full aspect-square object-cover"
-            />
+      <div
+        key={item.title}
+        className="bg-black/70 rounded-3xl overflow-hidden border border-red-900"
+      >
 
-            <div className="p-5">
+        <img
+          src={item.image}
+          alt={item.title}
+          className="w-full aspect-square object-cover"
+        />
 
-              <h2 className="text-2xl font-bold">
-                {item.title}
-              </h2>
+        <div className="p-5">
 
-              <div className="flex gap-3 mt-4">
+          <h2 className="text-2xl font-bold text-white mb-4">
+            {item.title}
+          </h2>
 
-                <Link
-                  href={`/${item.title.toLowerCase().replace(" ", "")}`}
-                  className="px-5 py-2 rounded-full bg-purple-700"
-                >
-                  View Kalaa
-                </Link>
+          <div className="flex justify-center">
 
-              </div>
-
-            </div>
+            <Link
+              href={`/${item.title.toLowerCase().replace(" ", "")}`}
+              className="px-5 py-2 rounded-full bg-purple-700 hover:bg-purple-800 text-white"
+            >
+              View Kalaa
+            </Link>
 
           </div>
 
-        ))}
+        </div>
 
       </div>
 
+    ))}
+
+  </div>
+
+)}
       
       <div className="mt-20 w-[90%] max-w-6xl">
 
-        <h1 className="text-4xl font-bold text-center mb-10 text-purple-500">
-          Uploaded Kalaa
-        </h1>
-
+        <h1
+  id="uploaded-kalaa"
+  className="text-4xl font-bold text-center text-purple-500 mb-10"
+>
+  Uploaded Kalaa
+</h1>
         <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
 
          {(search ? filteredPosts : posts)
