@@ -13,7 +13,7 @@ export default function Home() {
   const [category, setCategory] = useState("");
   const [tags, setTags] = useState("");
   const [image, setImage] = useState<any>(null);
-  const [filteredPosts, setFilteredPosts] = useState(posts);
+  const [filteredPosts, setFilteredPosts] = useState<any[]>([]);
   const [selectedImage, setSelectedImage] = useState("");
   const [selectedPost, setSelectedPost] = useState<any>(null);
 
@@ -117,51 +117,50 @@ export default function Home() {
 
   async function handleLike(id: number) {
 
-  const post = posts.find((p) => p.id === id);
+    const post = posts.find((p) => p.id === id);
 
-  if (!post) return;
+    if (!post) return;
 
-  const alreadyLiked = localStorage.getItem(`liked-${id}`);
+    const alreadyLiked = localStorage.getItem(`liked-${id}`);
 
-  if (alreadyLiked) {
-    alert("Already liked!");
-    return;
+    if (alreadyLiked) {
+      alert("Already liked!");
+      return;
+    }
+
+    const { error: insertError } = await supabase
+      .from("liked_posts")
+      .insert([
+        {
+          post_id: id,
+        },
+      ]);
+
+    if (insertError) {
+      console.log(insertError);
+      alert("Unable to save like");
+      return;
+    }
+
+    const newLikeCount = (post.likes || 0) + 1;
+
+    const { error: updateError } = await supabase
+      .from("posts")
+      .update({
+        likes: newLikeCount,
+      })
+      .eq("id", id);
+
+    if (updateError) {
+      console.log(updateError);
+      alert("Unable to update likes");
+      return;
+    }
+
+    localStorage.setItem(`liked-${id}`, "true");
+
+    await getPosts();
   }
-
-  const { error: insertError } = await supabase
-    .from("liked_posts")
-    .insert([
-      {
-        post_id: id,
-      },
-    ]);
-
-  if (insertError) {
-    console.log(insertError);
-    alert("Unable to save like");
-    return;
-  }
-
-  const newLikeCount = (post.likes || 0) + 1;
-
-  const { error: updateError } = await supabase
-    .from("posts")
-    .update({
-      likes: newLikeCount,
-    })
-    .eq("id", id);
-
-  if (updateError) {
-    console.log(updateError);
-    alert("Unable to update likes");
-    return;
-  }
-
-  localStorage.setItem(`liked-${id}`, "true");
-
-  await getPosts();
-}
-    
 
   const kalaas = [
 
@@ -218,184 +217,81 @@ export default function Home() {
       </div>
 
       <form
-  onSubmit={(e) => {
-    e.preventDefault();
+        onSubmit={(e) => {
+          e.preventDefault();
 
-    const results = posts.filter((post) =>
-      post.title.toLowerCase().includes(search.toLowerCase())
-    );
+          const results = posts.filter((post) =>
+            post.title.toLowerCase().includes(search.toLowerCase())
+          );
 
-    setFilteredPosts(results);
+          setFilteredPosts(results);
 
-    document
-      .getElementById("uploaded-kalaa")
-      ?.scrollIntoView({ behavior: "smooth" });
-  }}
-  className="flex items-center justify-center gap-3 mt-10 mb-20"
->
+          document
+            .getElementById("uploaded-kalaa")
+            ?.scrollIntoView({ behavior: "smooth" });
+        }}
+        className="flex items-center justify-center gap-3 mt-10 mb-20"
+      >
 
-  <input
-    type="text"
-    placeholder="Search kalaa..."
-    value={search}
-    onChange={(e) => {
+        <input
+          type="text"
+          placeholder="Search kalaa..."
+          value={search}
+          onChange={(e) => {
 
-  const value = e.target.value;
+            const value = e.target.value;
 
-  setSearch(value);
+            setSearch(value);
 
-  const results = posts.filter((post) =>
-    post.title.toLowerCase().includes(value.toLowerCase())
-  );
+            const results = posts.filter((post) =>
+              post.title.toLowerCase().includes(value.toLowerCase())
+            );
 
-  setFilteredPosts(results);
-}}
-    className="w-[600px] max-w-[90vw] bg-[#111] border border-red-900 text-white px-6 py-4 rounded-full outline-none"
-  />
+            setFilteredPosts(results);
+          }}
+          className="w-[600px] max-w-[90vw] bg-[#111] border border-red-900 text-white px-6 py-4 rounded-full outline-none"
+        />
 
-  <button
-    type="submit"
-    className="bg-pink-700 hover:bg-pink-800 w-14 h-14 rounded-full text-white text-xl"
-  >
-    🔍
-  </button>
+        <button
+          type="submit"
+          className="bg-pink-700 hover:bg-pink-800 w-14 h-14 rounded-full text-white text-xl"
+        >
+          🔍
+        </button>
 
-</form>
+      </form>
 
       {!search && (
 
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 w-[90%] mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 w-[90%] mx-auto">
 
-    {filteredKalaas.map((item) => (
-
-      <div
-        key={item.title}
-        className="bg-black/70 rounded-3xl overflow-hidden border border-red-900"
-      >
-
-        <img
-          src={item.image}
-          alt={item.title}
-          className="w-full aspect-square object-cover"
-        />
-
-        <div className="p-5">
-
-          <h2 className="text-2xl font-bold text-white mb-4">
-            {item.title}
-          </h2>
-
-          <div className="flex justify-center">
-
-            <Link
-              href={`/${item.title.toLowerCase().replace(" ", "")}`}
-              className="px-5 py-2 rounded-full bg-purple-700 hover:bg-purple-800 text-white"
-            >
-              View Kalaa
-            </Link>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    ))}
-
-  </div>
-
-)}
-
-      
-      <div className="mt-20 w-[90%] max-w-6xl">
-
-        <h1
-  id="uploaded-kalaa"
-  className="text-4xl font-bold text-center text-purple-500 mb-10"
->
-  Uploaded Kalaa
-</h1>
-        <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
-
-         {(search ? filteredPosts : posts)
-  .filter((post) =>
-    post.title.toLowerCase().includes(search.toLowerCase())
-  )
-  .map((post) => (
+          {filteredKalaas.map((item) => (
 
             <div
-              key={post.id}
-              className="bg-zinc-900 rounded-3xl overflow-hidden break-inside-avoid mb-8 hover:shadow-[0_0_30px_rgba(168,85,247,0.4)] transition duration-500"
+              key={item.title}
+              className="bg-black/70 rounded-3xl overflow-hidden border border-red-900"
             >
 
-              <div
- onClick={() => {
-  setSelectedImage(post.image || post.image_url);
-  setSelectedPost(post);
-}}
-  className="cursor-pointer overflow-hidden"
->
-              
-
-                <img
-                  src={post.image_url || post.image}
-                  alt={post.title}
-                  className="w-full max-h-[800px] object-contain bg-black transition duration-500 hover:scale-105"
-                />
-
-              </div>
+              <img
+                src={item.image}
+                alt={item.title}
+                className="w-full aspect-square object-cover"
+              />
 
               <div className="p-5">
 
-  <h2 className="text-2xl font-bold">
-    {post.title}
-  </h2>
+                <h2 className="text-2xl font-bold text-white mb-4">
+                  {item.title}
+                </h2>
 
-  <p className="text-zinc-400 mt-1">
-    {
-      post.category === "Durga"
-        ? "Durga Maa"
-        : post.category === "Kali"
-        ? "Kali Maa"
-        : post.category
-    }
-  </p>
+                <div className="flex justify-center">
 
-  <div className="flex gap-4 mt-4 flex-wrap">
-
-                  <button
-                    onClick={() => handleLike(post.id)}
-                    className="bg-pink-700 hover:bg-pink-900 px-4 py-2 rounded-xl"
+                  <Link
+                    href={`/${item.title.toLowerCase().replace(" ", "")}`}
+                    className="px-5 py-2 rounded-full bg-purple-700 hover:bg-purple-800 text-white"
                   >
-                    ❤️ {post.likes || 0}
-                  </button>
-
-                  <button
-  onClick={() => {
-    const imageUrl = post.image_url || post.image;
-
-    fetch(imageUrl)
-      .then((res) => res.blob())
-      .then((blob) => {
-        const url = window.URL.createObjectURL(blob);
-
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `${post.title}.jpg`;
-
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-
-        window.URL.revokeObjectURL(url);
-      });
-  }}
-  className="bg-purple-700 hover:bg-purple-900 px-4 py-2 rounded-xl"
->
-  Download
-</button>
-
-                  
+                    View Kalaa
+                  </Link>
 
                 </div>
 
@@ -407,107 +303,111 @@ export default function Home() {
 
         </div>
 
-      </div>
+      )}
 
-      <div className="py-20 text-zinc-500 text-sm">
-        Son Of Parvati • Kalaa Archive
-      </div>
-      {selectedImage && (
-  <div
-    onClick={() => {
-      setSelectedImage("");
-      setSelectedPost(null);
-    }}
-    className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-5"
-  >
+      <div className="mt-20 w-[90%] max-w-6xl">
 
-    <div
-      onClick={(e) => e.stopPropagation()}
-      className="max-w-5xl w-full bg-zinc-900 rounded-3xl overflow-hidden"
-    >
+        <h1
+          id="uploaded-kalaa"
+          className="text-4xl font-bold text-center text-purple-500 mb-10"
+        >
+          Uploaded Kalaa
+        </h1>
 
-      <img
-        src={selectedImage}
-        className="w-full max-h-[80vh] object-contain bg-black"
-      />
+        <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
 
-      <div className="p-6">
+          {(search ? filteredPosts : posts)
+            .filter((post) =>
+              post.title.toLowerCase().includes(search.toLowerCase())
+            )
+            .map((post) => (
 
-        <h2 className="text-3xl font-bold">
-          {selectedPost?.title}
-        </h2>
+              <div
+                key={post.id}
+                className="bg-zinc-900 rounded-3xl overflow-hidden break-inside-avoid mb-8 hover:shadow-[0_0_30px_rgba(168,85,247,0.4)] transition duration-500"
+              >
 
-        <p className="text-zinc-400 mt-2">
-          {
-            selectedPost?.category === "Durga"
-              ? "Durga Maa"
-              : selectedPost?.category === "Kali"
-              ? "Kali Maa"
-              : selectedPost?.category
-          }
-        </p>
+                <div
+                  onClick={() => {
+                    setSelectedImage(post.image || post.image_url);
+                    setSelectedPost(post);
+                  }}
+                  className="cursor-pointer overflow-hidden"
+                >
 
-        <div className="flex gap-4 mt-6 flex-wrap">
+                  <img
+                    src={post.image_url || post.image}
+                    alt={post.title}
+                    className="w-full max-h-[800px] object-contain bg-black transition duration-500 hover:scale-105"
+                  />
 
-          <button
-            onClick={() => handleLike(selectedPost.id)}
-            className="bg-pink-700 hover:bg-pink-900 px-5 py-3 rounded-xl"
-          >
-            ❤️ {selectedPost?.likes || 0}
-          </button>
+                </div>
 
-          <button
-            onClick={() => {
-              const imageUrl =
-                selectedPost.image_url || selectedPost.image;
+                <div className="p-5">
 
-              fetch(imageUrl)
-                .then((res) => res.blob())
-                .then((blob) => {
+                  <h2 className="text-2xl font-bold">
+                    {post.title}
+                  </h2>
 
-                  const url =
-                    window.URL.createObjectURL(blob);
+                  <p className="text-zinc-400 mt-1">
+                    {
+                      post.category === "Durga"
+                        ? "Durga Maa"
+                        : post.category === "Kali"
+                        ? "Kali Maa"
+                        : post.category
+                    }
+                  </p>
 
-                  const a =
-                    document.createElement("a");
+                  <div className="flex gap-4 mt-4 flex-wrap">
 
-                  a.href = url;
+                    <button
+                      onClick={() => handleLike(post.id)}
+                      className="bg-pink-700 hover:bg-pink-900 px-4 py-2 rounded-xl"
+                    >
+                      ❤️ {post.likes || 0}
+                    </button>
 
-                  a.download =
-                    `${selectedPost.title}.jpg`;
+                    <a
+                      href={post.image_url || post.image}
+                      download={`${post.title}.jpg`}
+                      className="bg-purple-700 hover:bg-purple-900 px-4 py-2 rounded-xl"
+                    >
+                      Download
+                    </a>
 
-                  document.body.appendChild(a);
+                  </div>
 
-                  a.click();
+                </div>
 
-                  a.remove();
+              </div>
 
-                  window.URL.revokeObjectURL(url);
-                });
-            }}
-            className="bg-purple-700 hover:bg-purple-900 px-5 py-3 rounded-xl"
-          >
-            Download
-          </button>
-
-          {isAdmin && window.location.pathname === "/admin" && (
-            <button
-              onClick={() => deletePost(selectedPost.id)}
-              className="bg-red-700 hover:bg-red-900 px-5 py-3 rounded-xl"
-            >
-              Delete
-            </button>
-          )}
+            ))}
 
         </div>
 
       </div>
 
-    </div>
+      <div className="py-20 text-zinc-500 text-sm">
+        Son Of Parvati • Kalaa Archive
+      </div>
 
-  </div>
-)}
-      
+      {selectedImage && (
+        <div
+          onClick={() => {
+            setSelectedImage("");
+            setSelectedPost(null);
+          }}
+          className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-5"
+        >
+
+          <img
+            src={selectedImage}
+            className="max-h-[95vh] max-w-[95vw] rounded-3xl shadow-2xl"
+          />
+
+        </div>
+      )}
 
     </main>
   );
