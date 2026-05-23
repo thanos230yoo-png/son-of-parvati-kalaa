@@ -17,7 +17,13 @@ export default function AdminPage() {
   const [category, setCategory] = useState("");
   const [tags, setTags] = useState("");
   const [image, setImage] = useState<any>(null);
+const [editingPost, setEditingPost] = useState<any>(null);
 
+const [editTitle, setEditTitle] = useState("");
+
+const [editCategory, setEditCategory] = useState("");
+
+const [editTags, setEditTags] = useState("");
   useEffect(() => {
 
     checkAdmin();
@@ -146,6 +152,34 @@ setLoading(false);
 
     getPosts();
   }
+  async function saveEdit() {
+
+  if (!editingPost) return;
+
+  const { error } = await supabase
+    .from("posts")
+    .update({
+      title: editTitle,
+      category: editCategory,
+      tags: editTags,
+    })
+    .eq("id", editingPost.id);
+
+  if (error) {
+
+    alert("Update failed");
+
+    console.log(error);
+
+    return;
+  }
+
+  alert("Post updated!");
+
+  setEditingPost(null);
+
+  getPosts();
+}
 
   if (loading) {
 
@@ -160,6 +194,63 @@ setLoading(false);
     );
 
   }
+  {editingPost && (
+
+  <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+
+    <div className="bg-[#111] p-8 rounded-3xl w-[90%] max-w-xl border border-purple-800">
+
+      <h2 className="text-3xl font-bold text-purple-500 mb-6">
+        Edit Kalaa
+      </h2>
+
+      <input
+        type="text"
+        value={editTitle}
+        onChange={(e) => setEditTitle(e.target.value)}
+        placeholder="Title"
+        className="w-full mb-4 bg-black text-white px-4 py-3 rounded-xl outline-none"
+      />
+
+      <input
+        type="text"
+        value={editCategory}
+        onChange={(e) => setEditCategory(e.target.value)}
+        placeholder="Category"
+        className="w-full mb-4 bg-black text-white px-4 py-3 rounded-xl outline-none"
+      />
+
+      <input
+        type="text"
+        value={editTags}
+        onChange={(e) => setEditTags(e.target.value)}
+        placeholder="Tags"
+        className="w-full mb-6 bg-black text-white px-4 py-3 rounded-xl outline-none"
+      />
+
+      <div className="flex gap-4">
+
+        <button
+          onClick={saveEdit}
+          className="bg-purple-700 hover:bg-purple-800 px-6 py-3 rounded-xl text-white font-bold"
+        >
+          Save
+        </button>
+
+        <button
+          onClick={() => setEditingPost(null)}
+          className="bg-red-700 hover:bg-red-800 px-6 py-3 rounded-xl text-white font-bold"
+        >
+          Cancel
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+)}
 <div className="mt-20">
 
   <h2 className="text-5xl font-bold text-center text-purple-500 mb-10">
@@ -189,18 +280,31 @@ setLoading(false);
           <p className="text-gray-400 mb-4">
             {post.category}
           </p>
+<div className="flex gap-3">
 
-          <div className="flex gap-3">
+  <button
+    onClick={() => deletePost(post.id)}
+    className="bg-red-700 hover:bg-red-800 px-4 py-2 rounded-xl text-white font-bold"
+  >
+    Delete
+  </button>
 
-            <button
-              onClick={() => deletePost(post.id)}
-              className="bg-red-700 hover:bg-red-800 px-4 py-2 rounded-xl text-white font-bold"
-            >
-              Delete
-            </button>
+  <button
+    onClick={() => {
+      setEditingPost(post);
 
-          </div>
+      setEditTitle(post.title);
 
+      setEditCategory(post.category);
+
+      setEditTags(post.tags || "");
+    }}
+    className="bg-blue-700 hover:bg-blue-800 px-4 py-2 rounded-xl text-white font-bold"
+  >
+    Edit
+  </button>
+
+</div>
         </div>
 
       </div>
