@@ -368,13 +368,36 @@ export default function Home() {
                       ❤️ {post.likes || 0}
                     </button>
 
-                    <a
-                      href={post.image_url || post.image}
-                      download={`${post.title}.jpg`}
-                      className="bg-purple-700 hover:bg-purple-900 px-4 py-2 rounded-xl"
-                    >
-                      Download
-                    </a>
+                   <button
+  onClick={async () => {
+
+    const imageUrl = post.image_url || post.image;
+
+    const response = await fetch(imageUrl);
+
+    const blob = await response.blob();
+
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+
+    a.href = url;
+
+    a.download = `${post.title}.jpg`;
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    a.remove();
+
+    window.URL.revokeObjectURL(url);
+
+  }}
+  className="bg-purple-700 hover:bg-purple-900 px-4 py-2 rounded-xl"
+>
+  Download
+</button>
 
                   </div>
 
