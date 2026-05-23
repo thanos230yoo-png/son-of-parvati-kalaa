@@ -13,6 +13,7 @@ export default function Home() {
   const [category, setCategory] = useState("");
   const [tags, setTags] = useState("");
   const [image, setImage] = useState<any>(null);
+  const [filteredPosts, setFilteredPosts] = useState(posts);
 
   useEffect(() => {
 
@@ -216,8 +217,14 @@ export default function Home() {
 
       <form
   onSubmit={(e) => {
-    e.preventDefault();
-  }}
+  e.preventDefault();
+
+  const results = posts.filter((post) =>
+    post.title.toLowerCase().includes(search.toLowerCase())
+  );
+
+  setFilteredPosts(results);
+}}
   className="flex items-center gap-3 mt-8 w-full justify-center"
 >
 
@@ -287,7 +294,7 @@ export default function Home() {
 
         <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
 
-          {posts
+         {(search ? filteredPosts : posts)
   .filter((post) =>
     post.title.toLowerCase().includes(search.toLowerCase())
   )
