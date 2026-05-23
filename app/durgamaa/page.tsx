@@ -16,13 +16,23 @@ export default function DurgaMaaPage() {
   }
 
   async function getPosts() {
-    const { data } = await supabase
-      .from("posts")
-      .select("*")
-      .eq("category", "Durga");
+  const { data, error } = await supabase
+    .from("posts")
+    .select("*");
 
-    setPosts(data || []);
+  if (error) {
+    console.log(error);
+    return;
   }
+
+  const filtered =
+    data?.filter((post) =>
+      post.title?.toLowerCase().includes("durga") ||
+      post.category?.toLowerCase().includes("durga")
+    ) || [];
+
+  setPosts(filtered);
+}
 
   async function handleLike(post: any) {
     let userId = localStorage.getItem("user_id");

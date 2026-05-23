@@ -45,14 +45,23 @@ async function deletePost(id: number) {
 }
 
   async function getPosts() {
+  const { data, error } = await supabase
+    .from("posts")
+    .select("*");
 
-    const { data } = await supabase
-      .from("posts")
-      .select("*")
-      .eq("category", "Kali");
-
-    setPosts(data || []);
+  if (error) {
+    console.log(error);
+    return;
   }
+
+  const filtered =
+    data?.filter((post) =>
+      post.title?.toLowerCase().includes("durga") ||
+      post.category?.toLowerCase().includes("durga")
+    ) || [];
+
+  setPosts(filtered);
+}
 
 
   return (
