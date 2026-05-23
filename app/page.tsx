@@ -28,6 +28,7 @@ export default function Home() {
 
     const { data } = await supabase.auth.getUser();
 
+
     if (data.user?.email === "thanos230yoo@gmail.com") {
 
       setIsAdmin(true);
