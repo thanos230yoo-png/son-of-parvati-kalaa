@@ -43,28 +43,6 @@ export default function Home() {
 
     setPosts(data || []);
   }
-  async function updatePost(id: number, newTitle: string) {
-
-  const { error } = await supabase
-    .from("posts")
-    .update({
-      title: newTitle,
-    })
-    .eq("id", id);
-
-  if (error) {
-
-    console.log(error);
-
-    alert("Unable to update");
-
-    return;
-  }
-
-  alert("Updated 🔥");
-
-  getPosts();
-}
 
   async function deletePost(id: number) {
 
@@ -385,51 +363,13 @@ export default function Home() {
                   </button>
 
                   <button
-  onClick={async () => {
-    const response = await fetch(post.image);
-    const blob = await response.blob();
-
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${post.title}.png`;
-
-    document.body.appendChild(a);
-    a.click();
-
-    a.remove();
-    window.URL.revokeObjectURL(url);
-  }}
+ 
   className="bg-purple-700 hover:bg-purple-900 px-4 py-2 rounded-xl"
 >
   Download
 </button>
 
-                  {isAdmin && (
-
-                    <button
-                      onClick={() => deletePost(post.id)}
-                      className="bg-red-700 px-4 py-2 rounded-xl"
-                    >
-                      Delete
-                      <button
-  onClick={() => {
-
-    const newTitle = prompt("New title", post.title);
-
-    if (!newTitle) return;
-
-    updatePost(post.id, newTitle);
-  }}
-  className="bg-blue-700 hover:bg-blue-900 px-4 py-2 rounded-xl"
->
-  Edit
-</button>
-                    </button>
-                    
-
-                  )}
+                  
 
                 </div>
 
@@ -446,21 +386,7 @@ export default function Home() {
       <div className="py-20 text-zinc-500 text-sm">
         Son Of Parvati • Kalaa Archive
       </div>
-      {selectedImage && (
-
-  <div
-    onClick={() => setSelectedImage("")}
-    className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-5"
-  >
-
-    <img
-      src={selectedImage}
-      className="max-w-full max-h-full rounded-3xl"
-    />
-
-  </div>
-
-)}
+      
 
     </main>
   );
