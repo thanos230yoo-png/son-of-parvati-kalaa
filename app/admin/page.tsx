@@ -42,22 +42,27 @@ export default function AdminPage() {
 setLoading(false);
 }
 
-  async function getPosts() {
+ async function getPosts() {
 
-  const { data, error } = await supabase
+  const response = await supabase
     .from("posts")
     .select("*")
     .order("created_at", { ascending: false });
 
-  console.log("POSTS:", data);
-  console.log("ERROR:", error);
+  console.log("FULL RESPONSE:", response);
 
-  if (error) {
-    console.log(error);
+  if (response.error) {
+
+    console.log(response.error);
+
+    alert(response.error.message);
+
     return;
   }
 
-  setPosts(data || []);
+  console.log("DATA:", response.data);
+
+  setPosts(response.data || []);
 }
   
 
