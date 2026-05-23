@@ -36,9 +36,8 @@ export default function Home() {
 
     const { data } = await supabase
       .from("posts")
-      .select()
-      .order("id", { ascending: false })
-      .throwOnError();
+      .select("*")
+      .order("id", { ascending: false });
 
     setPosts(data || []);
   }
@@ -470,7 +469,3 @@ export default function Home() {
     </main>
   );
 }
-function throwOnError() {
-  throw new Error("Function not implemented.");
-}
-
