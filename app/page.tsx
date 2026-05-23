@@ -112,91 +112,53 @@ export default function Home() {
     }
   }
 
-  async function handleLike(id: number): Promise<void> {
+  async function handleLike(id: number) {
 
-    const post = posts.find((item) => item.id === id);
+  const post = posts.find((p) => p.id === id);
 
-    if (!post) return;
+  if (!post) return;
 
-    // UNIQUE USER ID
+  const alreadyLiked = localStorage.getItem(`liked-${id}`);
 
-    let userId = localStorage.getItem("user_id");
-
-    if (
-      !userId ||
-      userId === "null" ||
-      userId === "undefined"
-    ) {
-
-      userId = crypto.randomUUID();
-
-      localStorage.setItem("user_id", userId);
-    }
-
-    // CHECK EXISTING LIKE
-
-    const { data: existingLike, error: checkError } =
-      await supabase
-        .from("liked_posts")
-        .select("id")
-        .eq("post_id", id)
-        .eq("user_id", userId)
-        .maybeSingle();
-
-    const alreadyLiked = localStorage.getItem(`liked-${id}`);
-
-if (alreadyLiked) {
-  alert("Already liked!");
-  return;
-}
-   localStorage.setItem(`liked-${id}`, "true");
-
-    
-
-    // INSERT LIKE RECORD
-
-    const { error: insertError } = await supabase
-      .from("liked_posts")
-      .insert([
-        {
-          post_id: id,
-          user_id: userId,
-        },
-      ]);
-
-    if (insertError) {
-
-      console.log(insertError);
-
-      alert("Unable to save like.");
-
-      return;
-    }
-
-    // UPDATE COUNT
-
-    const newLikeCount = (post.likes || 0) + 1;
-
-    const { error: updateError } = await supabase
-      .from("posts")
-      .update({
-        likes: newLikeCount,
-      })
-      .eq("id", id);
-
-    if (updateError) {
-
-      console.log(updateError);
-
-      alert("Unable to update likes.");
-
-      return;
-    }
-
-    // REFRESH POSTS
-
-    await getPosts();
+  if (alreadyLiked) {
+    alert("Already liked!");
+    return;
   }
+
+  const { error: insertError } = await supabase
+    .from("liked_posts")
+    .insert([
+      {
+        post_id: id,
+      },
+    ]);
+
+  if (insertError) {
+    console.log(insertError);
+    alert("Unable to save like");
+    return;
+  }
+
+  const newLikeCount = (post.likes || 0) + 1;
+
+  const { error: updateError } = await supabase
+    .from("posts")
+    .update({
+      likes: newLikeCount,
+    })
+    .eq("id", id);
+
+  if (updateError) {
+    console.log(updateError);
+    alert("Unable to update likes");
+    return;
+  }
+
+  localStorage.setItem(`liked-${id}`, "true");
+
+  await getPosts();
+}
+    
 
   const kalaas = [
 
