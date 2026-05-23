@@ -56,8 +56,8 @@ async function deletePost(id: number) {
 
   const filtered =
     data?.filter((post) =>
-      post.title?.toLowerCase().includes("durga") ||
-      post.category?.toLowerCase().includes("durga")
+      post.title?.toLowerCase().includes("kali") ||
+post.category?.toLowerCase().includes("kali")
     ) || [];
 
   setPosts(filtered);

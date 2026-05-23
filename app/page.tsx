@@ -15,6 +15,7 @@ export default function Home() {
   const [image, setImage] = useState<any>(null);
   const [filteredPosts, setFilteredPosts] = useState(posts);
   const [selectedImage, setSelectedImage] = useState("");
+  const [selectedPost, setSelectedPost] = useState<any>(null);
 
   useEffect(() => {
 
@@ -304,6 +305,7 @@ export default function Home() {
   </div>
 
 )}
+
       
       <div className="mt-20 w-[90%] max-w-6xl">
 
@@ -327,7 +329,10 @@ export default function Home() {
             >
 
               <div
- onClick={() => setSelectedImage(post.image_url || post.image)}
+ onClick={() => {
+  setSelectedImage(post.image || post.image_url);
+  setSelectedPost(post);
+}}
   className="cursor-pointer overflow-hidden"
 >
               
@@ -342,18 +347,21 @@ export default function Home() {
 
               <div className="p-5">
 
-                <h2 className="text-2xl font-bold">
-                  {post.title}
-                </h2>
-{
-  post.category === "Durga"
-    ? "Durga Maa"
-    : post.category === "Kali"
-    ? "Kali Maa"
-    : post.category
-}
+  <h2 className="text-2xl font-bold">
+    {post.title}
+  </h2>
 
-                <div className="flex gap-4 mt-4 flex-wrap">
+  <p className="text-zinc-400 mt-1">
+    {
+      post.category === "Durga"
+        ? "Durga Maa"
+        : post.category === "Kali"
+        ? "Kali Maa"
+        : post.category
+    }
+  </p>
+
+  <div className="flex gap-4 mt-4 flex-wrap">
 
                   <button
                     onClick={() => handleLike(post.id)}
@@ -404,6 +412,101 @@ export default function Home() {
       <div className="py-20 text-zinc-500 text-sm">
         Son Of Parvati • Kalaa Archive
       </div>
+      {selectedImage && (
+  <div
+    onClick={() => {
+      setSelectedImage("");
+      setSelectedPost(null);
+    }}
+    className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-5"
+  >
+
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="max-w-5xl w-full bg-zinc-900 rounded-3xl overflow-hidden"
+    >
+
+      <img
+        src={selectedImage}
+        className="w-full max-h-[80vh] object-contain bg-black"
+      />
+
+      <div className="p-6">
+
+        <h2 className="text-3xl font-bold">
+          {selectedPost?.title}
+        </h2>
+
+        <p className="text-zinc-400 mt-2">
+          {
+            selectedPost?.category === "Durga"
+              ? "Durga Maa"
+              : selectedPost?.category === "Kali"
+              ? "Kali Maa"
+              : selectedPost?.category
+          }
+        </p>
+
+        <div className="flex gap-4 mt-6 flex-wrap">
+
+          <button
+            onClick={() => handleLike(selectedPost.id)}
+            className="bg-pink-700 hover:bg-pink-900 px-5 py-3 rounded-xl"
+          >
+            ❤️ {selectedPost?.likes || 0}
+          </button>
+
+          <button
+            onClick={() => {
+              const imageUrl =
+                selectedPost.image_url || selectedPost.image;
+
+              fetch(imageUrl)
+                .then((res) => res.blob())
+                .then((blob) => {
+
+                  const url =
+                    window.URL.createObjectURL(blob);
+
+                  const a =
+                    document.createElement("a");
+
+                  a.href = url;
+
+                  a.download =
+                    `${selectedPost.title}.jpg`;
+
+                  document.body.appendChild(a);
+
+                  a.click();
+
+                  a.remove();
+
+                  window.URL.revokeObjectURL(url);
+                });
+            }}
+            className="bg-purple-700 hover:bg-purple-900 px-5 py-3 rounded-xl"
+          >
+            Download
+          </button>
+
+          {isAdmin && window.location.pathname === "/admin" && (
+            <button
+              onClick={() => deletePost(selectedPost.id)}
+              className="bg-red-700 hover:bg-red-900 px-5 py-3 rounded-xl"
+            >
+              Delete
+            </button>
+          )}
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+)}
       
 
     </main>
