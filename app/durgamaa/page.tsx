@@ -162,27 +162,37 @@ export default function DurgaMaaPage() {
                   ❤️ {post.likes || 0}
                 </button>
 
-                {/* DOWNLOAD */}
+               <button
+  onClick={async () => {
 
-                <a
-                  href={post.image_url || post.image}
-                  download
-                  target="_blank"
-                  className="bg-purple-700 hover:bg-purple-900 px-4 py-2 rounded-xl"
-                >
-                  Download
-                </a>
+    const imageUrl = post.image_url || post.image;
 
-                {/* DELETE */}
+    const response = await fetch(imageUrl);
 
-                {isAdmin && (
-                  <button
-                    onClick={() => deletePost(post.id)}
-                    className="bg-red-700 hover:bg-red-900 px-4 py-2 rounded-xl"
-                  >
-                    Delete
-                  </button>
-                )}
+    const blob = await response.blob();
+
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+
+    a.href = url;
+
+    a.download = `${post.title}.jpg`;
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    a.remove();
+
+    window.URL.revokeObjectURL(url);
+
+  }}
+  className="bg-purple-700 hover:bg-purple-900 px-4 py-2 rounded-xl"
+>
+  Download
+</button>
+
               </div>
             </div>
           </div>

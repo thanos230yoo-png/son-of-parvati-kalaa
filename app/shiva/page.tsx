@@ -85,14 +85,36 @@ checkAdmin();
                 {post.title}
               </h2>
 
-              <a
-                href={post.image}
-                download
-                target="_blank"
-                className="mt-4 inline-block bg-blue-700 hover:bg-blue-900 px-4 py-2 rounded-xl"
-              >
-                Download
-              </a>
+             <button
+  onClick={async () => {
+
+    const imageUrl = post.image_url || post.image;
+
+    const response = await fetch(imageUrl);
+
+    const blob = await response.blob();
+
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+
+    a.href = url;
+
+    a.download = `${post.title}.jpg`;
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    a.remove();
+
+    window.URL.revokeObjectURL(url);
+
+  }}
+  className="bg-purple-700 hover:bg-purple-900 px-4 py-2 rounded-xl"
+>
+  Download
+</button>
               <button
   onClick={async () => {
 
@@ -147,16 +169,8 @@ checkAdmin();
 >
   ❤️ {post.likes || 0}
 </button>
-{isAdmin && (
 
-  <button
-    onClick={() => deletePost(post.id)}
-    className="bg-red-700 hover:bg-red-900 px-4 py-2 rounded-xl"
-  >
-    Delete
-  </button>
 
-)}
 
             </div>
 
