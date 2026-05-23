@@ -14,6 +14,7 @@ export default function Home() {
   const [tags, setTags] = useState("");
   const [image, setImage] = useState<any>(null);
   const [filteredPosts, setFilteredPosts] = useState(posts);
+  const [selectedImage, setSelectedImage] = useState("");
 
   useEffect(() => {
 
@@ -325,10 +326,11 @@ export default function Home() {
               className="bg-zinc-900 rounded-3xl overflow-hidden break-inside-avoid mb-8 hover:shadow-[0_0_30px_rgba(168,85,247,0.4)] transition duration-500"
             >
 
-              <a
-                href={post.image}
-                target="_blank"
-              >
+              <div
+  onClick={() => setSelectedImage(post.image)}
+  className="cursor-pointer overflow-hidden"
+>
+              
 
                 <img
                   src={post.image}
@@ -336,17 +338,20 @@ export default function Home() {
                   className="w-full max-h-[800px] object-contain bg-black transition duration-500 hover:scale-105"
                 />
 
-              </a>
+              </div>
 
               <div className="p-5">
 
                 <h2 className="text-2xl font-bold">
                   {post.title}
                 </h2>
-
-                <p className="text-zinc-400 mt-2">
-                  {post.category}
-                </p>
+{
+  post.category === "Durga"
+    ? "Durga Maa"
+    : post.category === "Kali"
+    ? "Kali Maa"
+    : post.category
+}
 
                 <div className="flex gap-4 mt-4 flex-wrap">
 
@@ -405,6 +410,21 @@ export default function Home() {
       <div className="py-20 text-zinc-500 text-sm">
         Son Of Parvati • Kalaa Archive
       </div>
+      {selectedImage && (
+
+  <div
+    onClick={() => setSelectedImage("")}
+    className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-5"
+  >
+
+    <img
+      src={selectedImage}
+      className="max-w-full max-h-full rounded-3xl"
+    />
+
+  </div>
+
+)}
 
     </main>
   );
