@@ -214,17 +214,29 @@ export default function Home() {
 
       </div>
 
-      <div className="flex items-center gap-3 mt-8">
+      <form
+  onSubmit={(e) => {
+    e.preventDefault();
+  }}
+  className="flex items-center gap-3 mt-8 w-full justify-center"
+>
 
-        <input
-          type="text"
-          placeholder="Search kalaa..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-[600px] max-w-[90vw] bg-zinc-900 border border-red-800 rounded-full px-6 py-3 text-white outline-none"
-        />
+  <input
+    type="text"
+    placeholder="Search kalaa..."
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+    className="w-[600px] max-w-[90vw] bg-zinc-900 border border-red-800 rounded-full px-6 py-3 text-white outline-none"
+  />
 
-      </div>
+  <button
+    type="submit"
+    className="bg-pink-700 hover:bg-pink-900 px-5 py-3 rounded-full"
+  >
+    🔍
+  </button>
+
+</form>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-20 w-[90%] max-w-6xl">
 
