@@ -236,7 +236,18 @@ export default function Home() {
     type="text"
     placeholder="Search kalaa..."
     value={search}
-    onChange={(e) => setSearch(e.target.value)}
+    onChange={(e) => {
+
+  const value = e.target.value;
+
+  setSearch(value);
+
+  const results = posts.filter((post) =>
+    post.title.toLowerCase().includes(value.toLowerCase())
+  );
+
+  setFilteredPosts(results);
+}}
     className="w-[600px] max-w-[90vw] bg-[#111] border border-red-900 text-white px-6 py-4 rounded-full outline-none"
   />
 
@@ -311,7 +322,7 @@ export default function Home() {
 
             <div
               key={post.id}
-              className="bg-zinc-900 rounded-3xl overflow-hidden break-inside-avoid mb-8"
+              className="bg-zinc-900 rounded-3xl overflow-hidden break-inside-avoid mb-8 hover:shadow-[0_0_30px_rgba(168,85,247,0.4)] transition duration-500"
             >
 
               <a
@@ -322,7 +333,7 @@ export default function Home() {
                 <img
                   src={post.image}
                   alt={post.title}
-                  className="w-full max-h-[800px] object-contain bg-black"
+                  className="w-full max-h-[800px] object-contain bg-black transition duration-500 hover:scale-105"
                 />
 
               </a>
