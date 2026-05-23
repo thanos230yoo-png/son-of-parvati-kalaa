@@ -96,7 +96,7 @@ async function deletePost(id: number) {
   >
 
     <img
-  src={post.image}
+  src={post.image_url || post.image}
   alt={post.title}
   className="w-full max-h-[800px] object-contain bg-black"
 />
@@ -110,7 +110,7 @@ async function deletePost(id: number) {
       <div className="flex gap-3 mt-4">
 
         <a
-          href={post.image}
+          href={post.image_url || post.image}
           download
           target="_blank"
           className="bg-purple-700 hover:bg-purple-900 px-4 py-2 rounded-xl"

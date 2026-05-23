@@ -327,13 +327,13 @@ export default function Home() {
             >
 
               <div
-  onClick={() => setSelectedImage(post.image)}
+ onClick={() => setSelectedImage(post.image_url || post.image)}
   className="cursor-pointer overflow-hidden"
 >
               
 
                 <img
-                  src={post.image}
+                  src={post.image_url || post.image}
                   alt={post.title}
                   className="w-full max-h-[800px] object-contain bg-black transition duration-500 hover:scale-105"
                 />
@@ -363,7 +363,25 @@ export default function Home() {
                   </button>
 
                   <button
- 
+  onClick={() => {
+    const imageUrl = post.image_url || post.image;
+
+    fetch(imageUrl)
+      .then((res) => res.blob())
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${post.title}.jpg`;
+
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        window.URL.revokeObjectURL(url);
+      });
+  }}
   className="bg-purple-700 hover:bg-purple-900 px-4 py-2 rounded-xl"
 >
   Download

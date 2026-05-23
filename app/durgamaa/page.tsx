@@ -141,7 +141,7 @@ export default function DurgaMaaPage() {
 
             <a href={post.image} target="_blank">
               <img
-                src={post.image}
+                src={post.image_url || post.image}
                 alt={post.title}
                 className="w-full max-h-[800px] object-contain bg-black hover:scale-105 transition duration-300"
               />
@@ -165,7 +165,7 @@ export default function DurgaMaaPage() {
                 {/* DOWNLOAD */}
 
                 <a
-                  href={post.image}
+                  href={post.image_url || post.image}
                   download
                   target="_blank"
                   className="bg-purple-700 hover:bg-purple-900 px-4 py-2 rounded-xl"
