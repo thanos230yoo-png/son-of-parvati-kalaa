@@ -149,7 +149,7 @@ if (alreadyLiked) {
   alert("Already liked!");
   return;
 }
-    // ALREADY LIKED
+   localStorage.setItem(`liked-${id}`, "true");
 
     
 
