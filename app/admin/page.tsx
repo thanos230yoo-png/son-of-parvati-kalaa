@@ -47,8 +47,9 @@ export default function AdminPage() {
 
   const { data, error } = await supabase
     .from("posts")
-    .select("*")
-    .order("created_at", { ascending: false });
+    .select()
+    .order("created_at", { ascending: false })
+    .throwOnError()
 
   console.log("POSTS:", data);
   console.log("ERROR:", error);
@@ -365,3 +366,7 @@ export default function AdminPage() {
 
   );
 }
+function throwOnError() {
+  throw new Error("Function not implemented.");
+}
+
