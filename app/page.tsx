@@ -143,23 +143,15 @@ export default function Home() {
         .eq("user_id", userId)
         .maybeSingle();
 
-    if (checkError) {
+    const alreadyLiked = localStorage.getItem(`liked-${id}`);
 
-      console.log(checkError);
-
-      alert("Unable to verify like.");
-
-      return;
-    }
-
+if (alreadyLiked) {
+  alert("Already liked!");
+  return;
+}
     // ALREADY LIKED
 
-    if (existingLike) {
-
-      alert("Already liked!");
-
-      return;
-    }
+    
 
     // INSERT LIKE RECORD
 
