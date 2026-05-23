@@ -287,7 +287,11 @@ export default function Home() {
 
         <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
 
-          {posts.map((post) => (
+          {posts
+  .filter((post) =>
+    post.title.toLowerCase().includes(search.toLowerCase())
+  )
+  .map((post) => (
 
             <div
               key={post.id}
