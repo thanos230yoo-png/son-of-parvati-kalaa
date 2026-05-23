@@ -345,7 +345,13 @@ export default function Home() {
                 <h2 className="text-2xl font-bold">
                   {post.title}
                 </h2>
-                
+{
+  post.category === "Durga"
+    ? "Durga Maa"
+    : post.category === "Kali"
+    ? "Kali Maa"
+    : post.category
+}
 
                 <div className="flex gap-4 mt-4 flex-wrap">
 
