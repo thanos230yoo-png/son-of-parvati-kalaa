@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../lib/supabase";
-import { error } from "console";
 
 export default function AdminPage() {
 
@@ -17,60 +16,59 @@ export default function AdminPage() {
   const [category, setCategory] = useState("");
   const [tags, setTags] = useState("");
   const [image, setImage] = useState<any>(null);
-const [editingPost, setEditingPost] = useState<any>(null);
 
-const [editTitle, setEditTitle] = useState("");
+  // EDIT STATES
+  const [editingPost, setEditingPost] = useState<any>(null);
 
-const [editCategory, setEditCategory] = useState("");
+  const [editTitle, setEditTitle] = useState("");
 
-const [editTags, setEditTags] = useState("");
+  const [editCategory, setEditCategory] = useState("");
+
+  const [editTags, setEditTags] = useState("");
+
   useEffect(() => {
 
     checkAdmin();
-    
 
   }, []);
 
   async function checkAdmin() {
 
-  const { data } = await supabase.auth.getUser();
+    const { data } = await supabase.auth.getUser();
 
-  if (
-    data.user?.email !== "thanos230yoo@gmail.com"
-  ) {
+    if (
+      data.user?.email !==
+      "thanos230yoo@gmail.com"
+    ) {
 
-    router.push("/");
+      router.push("/");
 
-    return;
+      return;
+    }
+
+    await getPosts();
+
+    setLoading(false);
   }
 
-  await getPosts();
-setLoading(false);
-}
+  async function getPosts() {
 
- async function getPosts() {
+    const response = await supabase
+      .from("posts")
+      .select("*")
+      .order("created_at", {
+        ascending: false,
+      });
 
-  const response = await supabase
-    .from("posts")
-    .select("*")
-    .order("created_at", { ascending: false });
+    if (response.error) {
 
-  console.log("FULL RESPONSE:", response);
+      console.log(response.error);
 
-  if (response.error) {
+      return;
+    }
 
-    console.log(response.error);
-
-    alert(response.error.message);
-
-    return;
+    setPosts(response.data || []);
   }
-
-  console.log("DATA:", response.data);
-
-  setPosts(response.data || []);
-}
-  
 
   async function uploadPost() {
 
@@ -103,19 +101,21 @@ setLoading(false);
         .from("kalaa")
         .getPublicUrl(fileName);
 
-    const imageUrl = data.publicUrl;
+    const imageUrl =
+      data.publicUrl;
 
-    const { error } = await supabase
-      .from("posts")
-      .insert([
-        {
-          title,
-          image: imageUrl,
-          category,
-          tags,
-          likes: 0,
-        },
-      ]);
+    const { error } =
+      await supabase
+        .from("posts")
+        .insert([
+          {
+            title,
+            image: imageUrl,
+            category,
+            tags,
+            likes: 0,
+          },
+        ]);
 
     if (error) {
 
@@ -126,7 +126,6 @@ setLoading(false);
       return;
     }
 
-
     alert("Kalaa Uploaded 🔥");
 
     setTitle("");
@@ -136,7 +135,6 @@ setLoading(false);
 
     getPosts();
   }
-  
 
   async function deletePost(id: number) {
 
@@ -152,34 +150,36 @@ setLoading(false);
 
     getPosts();
   }
+
   async function saveEdit() {
 
-  if (!editingPost) return;
+    if (!editingPost) return;
 
-  const { error } = await supabase
-    .from("posts")
-    .update({
-      title: editTitle,
-      category: editCategory,
-      tags: editTags,
-    })
-    .eq("id", editingPost.id);
+    const { error } =
+      await supabase
+        .from("posts")
+        .update({
+          title: editTitle,
+          category: editCategory,
+          tags: editTags,
+        })
+        .eq("id", editingPost.id);
 
-  if (error) {
+    if (error) {
 
-    alert("Update failed");
+      console.log(error);
 
-    console.log(error);
+      alert("Update failed");
 
-    return;
+      return;
+    }
+
+    alert("Post updated!");
+
+    setEditingPost(null);
+
+    getPosts();
   }
-
-  alert("Post updated!");
-
-  setEditingPost(null);
-
-  getPosts();
-}
 
   if (loading) {
 
@@ -192,130 +192,91 @@ setLoading(false);
       </main>
 
     );
-
   }
-  {editingPost && (
 
-  <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-
-    <div className="bg-[#111] p-8 rounded-3xl w-[90%] max-w-xl border border-purple-800">
-
-      <h2 className="text-3xl font-bold text-purple-500 mb-6">
-        Edit Kalaa
-      </h2>
-
-      <input
-        type="text"
-        value={editTitle}
-        onChange={(e) => setEditTitle(e.target.value)}
-        placeholder="Title"
-        className="w-full mb-4 bg-black text-white px-4 py-3 rounded-xl outline-none"
-      />
-
-      <input
-        type="text"
-        value={editCategory}
-        onChange={(e) => setEditCategory(e.target.value)}
-        placeholder="Category"
-        className="w-full mb-4 bg-black text-white px-4 py-3 rounded-xl outline-none"
-      />
-
-      <input
-        type="text"
-        value={editTags}
-        onChange={(e) => setEditTags(e.target.value)}
-        placeholder="Tags"
-        className="w-full mb-6 bg-black text-white px-4 py-3 rounded-xl outline-none"
-      />
-
-      <div className="flex gap-4">
-
-        <button
-          onClick={saveEdit}
-          className="bg-purple-700 hover:bg-purple-800 px-6 py-3 rounded-xl text-white font-bold"
-        >
-          Save
-        </button>
-
-        <button
-          onClick={() => setEditingPost(null)}
-          className="bg-red-700 hover:bg-red-800 px-6 py-3 rounded-xl text-white font-bold"
-        >
-          Cancel
-        </button>
-
-      </div>
-
-    </div>
-
-  </div>
-
-)}
-<div className="mt-20">
-
-  <h2 className="text-5xl font-bold text-center text-purple-500 mb-10">
-    Uploaded Kalaa
-  </h2>
-
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-    
-    {posts.map((post) => (
-      <div
-        key={post.id}
-        className="bg-black/60 border border-purple-900 rounded-3xl overflow-hidden"
-      >
-
-        <img
-          src={post.image}
-          alt={post.title}
-          className="w-full h-56 object-cover"
-        />
-
-        <div className="p-4">
-
-          <h3 className="text-2xl font-bold text-white mb-2">
-            {post.title}
-          </h3>
-
-          <p className="text-gray-400 mb-4">
-            {post.category}
-          </p>
-<div className="flex gap-3">
-
-  <button
-    onClick={() => deletePost(post.id)}
-    className="bg-red-700 hover:bg-red-800 px-4 py-2 rounded-xl text-white font-bold"
-  >
-    Delete
-  </button>
-
-  <button
-    onClick={() => {
-      setEditingPost(post);
-
-      setEditTitle(post.title);
-
-      setEditCategory(post.category);
-
-      setEditTags(post.tags || "");
-    }}
-    className="bg-blue-700 hover:bg-blue-800 px-4 py-2 rounded-xl text-white font-bold"
-  >
-    Edit
-  </button>
-
-</div>
-        </div>
-
-      </div>
-    ))}
-
-  </div>
-
-</div>
   return (
 
     <main className="min-h-screen bg-black text-white p-10">
+
+      {/* EDIT MODAL */}
+
+      {editingPost && (
+
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+
+          <div className="bg-[#111] p-8 rounded-3xl w-[90%] max-w-xl border border-purple-800">
+
+            <h2 className="text-3xl font-bold text-purple-500 mb-6">
+
+              Edit Kalaa
+
+            </h2>
+
+            <input
+              type="text"
+              value={editTitle}
+              onChange={(e) =>
+                setEditTitle(
+                  e.target.value
+                )
+              }
+              placeholder="Title"
+              className="w-full mb-4 bg-black text-white px-4 py-3 rounded-xl outline-none"
+            />
+
+            <input
+              type="text"
+              value={editCategory}
+              onChange={(e) =>
+                setEditCategory(
+                  e.target.value
+                )
+              }
+              placeholder="Category"
+              className="w-full mb-4 bg-black text-white px-4 py-3 rounded-xl outline-none"
+            />
+
+            <input
+              type="text"
+              value={editTags}
+              onChange={(e) =>
+                setEditTags(
+                  e.target.value
+                )
+              }
+              placeholder="Tags"
+              className="w-full mb-6 bg-black text-white px-4 py-3 rounded-xl outline-none"
+            />
+
+            <div className="flex gap-4">
+
+              <button
+                onClick={saveEdit}
+                className="bg-purple-700 hover:bg-purple-800 px-6 py-3 rounded-xl text-white font-bold"
+              >
+
+                Save
+
+              </button>
+
+              <button
+                onClick={() =>
+                  setEditingPost(null)
+                }
+                className="bg-red-700 hover:bg-red-800 px-6 py-3 rounded-xl text-white font-bold"
+              >
+
+                Cancel
+
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
 
       {/* TITLE */}
 
@@ -342,7 +303,9 @@ setLoading(false);
             placeholder="Title"
             value={title}
             onChange={(e) =>
-              setTitle(e.target.value)
+              setTitle(
+                e.target.value
+              )
             }
             className="bg-black p-4 rounded-xl"
           />
@@ -350,7 +313,9 @@ setLoading(false);
           <select
             value={category}
             onChange={(e) =>
-              setCategory(e.target.value)
+              setCategory(
+                e.target.value
+              )
             }
             className="bg-black p-4 rounded-xl"
           >
@@ -359,12 +324,12 @@ setLoading(false);
               Choose Category
             </option>
 
-            <option value="Kali">
-              Kali
+            <option value="Kali maa">
+              Kali maa
             </option>
 
-            <option value="Durga">
-              Durga
+            <option value="Durga maa">
+              Durga maa
             </option>
 
             <option value="Krishna">
@@ -386,7 +351,9 @@ setLoading(false);
             placeholder="Tags"
             value={tags}
             onChange={(e) =>
-              setTags(e.target.value)
+              setTags(
+                e.target.value
+              )
             }
             className="bg-black p-4 rounded-xl"
           />
@@ -395,7 +362,8 @@ setLoading(false);
             type="file"
             onChange={(e) =>
               setImage(
-                e.target.files?.[0] || null
+                e.target.files?.[0] ||
+                null
               )
             }
             className="bg-black p-4 rounded-xl"
@@ -451,16 +419,44 @@ setLoading(false);
 
               </p>
 
-              <button
-                onClick={() =>
-                  deletePost(post.id)
-                }
-                className="bg-red-700 hover:bg-red-900 px-4 py-2 rounded-xl mt-4"
-              >
+              <div className="flex gap-3 mt-4">
 
-                Delete
+                <button
+                  onClick={() =>
+                    deletePost(post.id)
+                  }
+                  className="bg-red-700 hover:bg-red-900 px-4 py-2 rounded-xl"
+                >
 
-              </button>
+                  Delete
+
+                </button>
+
+                <button
+                  onClick={() => {
+
+                    setEditingPost(post);
+
+                    setEditTitle(
+                      post.title
+                    );
+
+                    setEditCategory(
+                      post.category
+                    );
+
+                    setEditTags(
+                      post.tags || ""
+                    );
+                  }}
+                  className="bg-blue-700 hover:bg-blue-900 px-4 py-2 rounded-xl"
+                >
+
+                  Edit
+
+                </button>
+
+              </div>
 
             </div>
 
