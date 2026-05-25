@@ -53,11 +53,11 @@ async function handleLike(post: any) {
   let userId = localStorage.getItem("user_id");
 
   if (!userId) {
-
     userId = crypto.randomUUID();
-
     localStorage.setItem("user_id", userId);
   }
+
+  // CHECK EXISTING LIKE
 
   const { data: existingLike } = await supabase
     .from("liked_posts")
@@ -67,11 +67,11 @@ async function handleLike(post: any) {
     .maybeSingle();
 
   if (existingLike) {
-
     alert("Already liked!");
-
     return;
   }
+
+  // INSERT LIKE RECORD
 
   const { error: insertError } = await supabase
     .from("liked_posts")
@@ -83,27 +83,30 @@ async function handleLike(post: any) {
     ]);
 
   if (insertError) {
-
     console.log(insertError);
-
-    alert("Like failed");
-
     return;
   }
 
-  const { error: updateError } = await supabase
+  // GET CURRENT REAL LIKE COUNT FROM DATABASE
+
+  const { data: currentPost } = await supabase
+    .from("posts")
+    .select("likes")
+    .eq("id", post.id)
+    .single();
+
+  const currentLikes = currentPost?.likes || 0;
+
+  // UPDATE USING REAL DATABASE VALUE
+
+  await supabase
     .from("posts")
     .update({
-      likes: (post.likes || 0) + 1,
+      likes: currentLikes + 1,
     })
     .eq("id", post.id);
 
-  if (updateError) {
-
-    console.log(updateError);
-
-    return;
-  }
+  // REFRESH POSTS
 
   getPosts();
 }

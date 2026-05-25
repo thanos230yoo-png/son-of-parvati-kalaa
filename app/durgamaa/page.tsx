@@ -35,61 +35,67 @@ export default function DurgaMaaPage() {
 }
 
   async function handleLike(post: any) {
-    let userId = localStorage.getItem("user_id");
 
-    if (!userId) {
-      userId = crypto.randomUUID();
-      localStorage.setItem("user_id", userId);
-    }
+  let userId = localStorage.getItem("user_id");
 
-    // CHECK IF ALREADY LIKED
-
-    const { data: existingLike } = await supabase
-      .from("liked_posts")
-      .select("*")
-      .eq("post_id", post.id)
-      .eq("user_id", userId)
-      .maybeSingle();
-
-    if (existingLike) {
-      alert("Already liked!");
-      return;
-    }
-
-    // INSERT LIKE
-
-    const { error: insertError } = await supabase
-      .from("liked_posts")
-      .insert([
-        {
-          post_id: post.id,
-          user_id: userId,
-        },
-      ]);
-
-    if (insertError) {
-      console.log(insertError);
-      alert("Like failed");
-      return;
-    }
-
-    // UPDATE POST LIKE COUNT
-
-    const { error: updateError } = await supabase
-      .from("posts")
-      .update({
-        likes: (post.likes || 0) + 1,
-      })
-      .eq("id", post.id);
-
-    if (updateError) {
-      console.log(updateError);
-      return;
-    }
-
-    getPosts();
+  if (!userId) {
+    userId = crypto.randomUUID();
+    localStorage.setItem("user_id", userId);
   }
 
+  // CHECK EXISTING LIKE
+
+  const { data: existingLike } = await supabase
+    .from("liked_posts")
+    .select("*")
+    .eq("post_id", post.id)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (existingLike) {
+    alert("Already liked!");
+    return;
+  }
+
+  // INSERT LIKE RECORD
+
+  const { error: insertError } = await supabase
+    .from("liked_posts")
+    .insert([
+      {
+        post_id: post.id,
+        user_id: userId,
+      },
+    ]);
+
+  if (insertError) {
+    console.log(insertError);
+    return;
+  }
+
+  // GET CURRENT REAL LIKE COUNT FROM DATABASE
+
+  const { data: currentPost } = await supabase
+    .from("posts")
+    .select("likes")
+    .eq("id", post.id)
+    .single();
+
+  const currentLikes = currentPost?.likes || 0;
+
+  // UPDATE USING REAL DATABASE VALUE
+
+  await supabase
+    .from("posts")
+    .update({
+      likes: currentLikes + 1,
+    })
+    .eq("id", post.id);
+
+  // REFRESH POSTS
+
+  getPosts();
+}
   async function deletePost(id: number) {
     await supabase
       .from("posts")

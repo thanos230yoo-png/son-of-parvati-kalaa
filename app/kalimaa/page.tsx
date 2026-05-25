@@ -140,55 +140,70 @@ post.category?.toLowerCase().includes("kali")
   Download
 </button>
 
-        <button
- onClick={async () => {
+<button
+  onClick={async () => {
 
-  const userId = localStorage.getItem("user_id");
+    let userId = localStorage.getItem("user_id");
 
-  if (!userId) {
-    const newId = crypto.randomUUID();
-    localStorage.setItem("user_id", newId);
-  }
+    if (!userId) {
+      userId = crypto.randomUUID();
+      localStorage.setItem("user_id", userId);
+    }
 
-  const finalUserId = localStorage.getItem("user_id");
+    // CHECK IF ALREADY LIKED
 
-  // CHECK IF ALREADY LIKED
+    const { data: existingLike } = await supabase
+      .from("liked_posts")
+      .select("*")
+      .eq("post_id", post.id)
+      .eq("user_id", userId)
+      .maybeSingle();
 
-  const { data: existingLike } = await supabase
-    .from("liked_posts")
-    .select("*")
-    .eq("post_id", post.id)
-    .eq("user_id", finalUserId)
-    .single();
+    if (existingLike) {
+      alert("Already liked!");
+      return;
+    }
 
-  if (existingLike) {
-    alert("Already liked!");
-    return;
-  }
+    // INSERT LIKE
 
-  // ADD LIKE RECORD
+    const { error: insertError } = await supabase
+      .from("liked_posts")
+      .insert([
+        {
+          post_id: post.id,
+          user_id: userId,
+        },
+      ]);
 
-  await supabase
-    .from("liked_posts")
-    .insert([
-      {
-        post_id: post.id,
-        user_id: finalUserId,
-      },
-    ]);
+    if (insertError) {
+      console.log(insertError);
+      return;
+    }
 
-  // UPDATE POST LIKE COUNT
+    // GET REAL CURRENT LIKES
 
-  await supabase
-    .from("posts")
-    .update({
-      likes: (post.likes || 0) + 1,
-    })
-    .eq("id", post.id);
+    const { data: currentPost } = await supabase
+      .from("posts")
+      .select("likes")
+      .eq("id", post.id)
+      .single();
 
-  getPosts();
+    const currentLikes = currentPost?.likes || 0;
 
-}}
+    // UPDATE USING REAL DATABASE VALUE
+
+    await supabase
+      .from("posts")
+      .update({
+        likes: currentLikes + 1,
+      })
+      .eq("id", post.id);
+
+    // REFRESH POSTS
+
+    getPosts();
+
+  }}
   className="bg-pink-700 hover:bg-pink-900 px-4 py-2 rounded-xl"
 >
   ❤️ {post.likes || 0}
