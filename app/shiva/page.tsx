@@ -52,29 +52,25 @@ async function handleLike(post: any) {
   let userId = localStorage.getItem("user_id");
 
   if (!userId) {
+
     userId = crypto.randomUUID();
+
     localStorage.setItem("user_id", userId);
   }
 
-  // CHECK IF ALREADY LIKED
-
-  const { data: existingLikes, error: likeError } = await supabase
+  const { data: existingLike } = await supabase
     .from("liked_posts")
     .select("*")
     .eq("post_id", post.id)
-    .eq("user_id", userId);
+    .eq("user_id", userId)
+    .maybeSingle();
 
-  if (likeError) {
-    console.log(likeError);
-    return;
-  }
+  if (existingLike) {
 
-  if (existingLikes && existingLikes.length > 0) {
     alert("Already liked!");
+
     return;
   }
-
-  // INSERT LIKE
 
   const { error: insertError } = await supabase
     .from("liked_posts")
@@ -86,23 +82,31 @@ async function handleLike(post: any) {
     ]);
 
   if (insertError) {
+
     console.log(insertError);
+
+    alert("Like failed");
+
     return;
   }
 
-  // UPDATE POST LIKE COUNT
-
-  await supabase
+  const { error: updateError } = await supabase
     .from("posts")
     .update({
       likes: (post.likes || 0) + 1,
     })
     .eq("id", post.id);
 
-  // REFRESH POSTS
+  if (updateError) {
+
+    console.log(updateError);
+
+    return;
+  }
 
   getPosts();
 }
+
 
   return (
     <main className="min-h-screen bg-black text-white p-10">

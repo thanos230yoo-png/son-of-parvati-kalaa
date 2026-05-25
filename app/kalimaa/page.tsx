@@ -140,62 +140,55 @@ post.category?.toLowerCase().includes("kali")
   Download
 </button>
 
-<button
-  onClick={async () => {
+        <button
+ onClick={async () => {
 
-    let userId = localStorage.getItem("user_id");
+  const userId = localStorage.getItem("user_id");
 
-    if (!userId) {
-      userId = crypto.randomUUID();
-      localStorage.setItem("user_id", userId);
-    }
+  if (!userId) {
+    const newId = crypto.randomUUID();
+    localStorage.setItem("user_id", newId);
+  }
 
-    // CHECK EXISTING LIKE
+  const finalUserId = localStorage.getItem("user_id");
 
-    const { data: existingLikes, error: likeError } = await supabase
-      .from("liked_posts")
-      .select("*")
-      .eq("post_id", post.id)
-      .eq("user_id", userId);
+  // CHECK IF ALREADY LIKED
 
-    if (likeError) {
-      console.log(likeError);
-      return;
-    }
+  const { data: existingLike } = await supabase
+    .from("liked_posts")
+    .select("*")
+    .eq("post_id", post.id)
+    .eq("user_id", finalUserId)
+    .single();
 
-    if (existingLikes && existingLikes.length > 0) {
-      alert("Already liked!");
-      return;
-    }
+  if (existingLike) {
+    alert("Already liked!");
+    return;
+  }
 
-    // INSERT LIKE
+  // ADD LIKE RECORD
 
-    const { error: insertError } = await supabase
-      .from("liked_posts")
-      .insert([
-        {
-          post_id: post.id,
-          user_id: userId,
-        },
-      ]);
+  await supabase
+    .from("liked_posts")
+    .insert([
+      {
+        post_id: post.id,
+        user_id: finalUserId,
+      },
+    ]);
 
-    if (insertError) {
-      console.log(insertError);
-      return;
-    }
+  // UPDATE POST LIKE COUNT
 
-    // UPDATE LIKE COUNT
+  await supabase
+    .from("posts")
+    .update({
+      likes: (post.likes || 0) + 1,
+    })
+    .eq("id", post.id);
 
-await supabase
-  .from("posts")
-  .update({
-    likes: (post.likes || 0) + 1,
-  })
-  .eq("id", post.id);
+  getPosts();
 
-    getPosts();
-
-  }}
+}}
   className="bg-pink-700 hover:bg-pink-900 px-4 py-2 rounded-xl"
 >
   ❤️ {post.likes || 0}

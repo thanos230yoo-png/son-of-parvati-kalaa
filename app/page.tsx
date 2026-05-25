@@ -116,62 +116,53 @@ export default function Home() {
     }
   }
 
- async function handleLike(post: any) {
+  async function handleLike(id: number) {
 
-  let userId = localStorage.getItem("user_id");
+    const post = posts.find((p) => p.id === id);
 
-  if (!userId) {
-    userId = crypto.randomUUID();
-    localStorage.setItem("user_id", userId);
+    if (!post) return;
+
+    const alreadyLiked = localStorage.getItem(`liked-${id}`);
+
+    if (alreadyLiked) {
+      alert("Already liked!");
+      return;
+    }
+
+    const { error: insertError } = await supabase
+      .from("liked_posts")
+      .insert([
+        {
+          post_id: id,
+        },
+      ]);
+
+    if (insertError) {
+      console.log(insertError);
+      alert("Unable to save like");
+      return;
+    }
+
+    const newLikeCount = (post.likes || 0) + 1;
+
+    const { error: updateError } = await supabase
+      .from("posts")
+      .update({
+        likes: newLikeCount,
+      })
+      .eq("id", id);
+
+    if (updateError) {
+      console.log(updateError);
+      alert("Unable to update likes");
+      return;
+    }
+
+    localStorage.setItem(`liked-${id}`, "true");
+
+    await getPosts();
   }
 
-  // CHECK IF ALREADY LIKED
-
-  const { data: existingLikes, error: likeError } = await supabase
-    .from("liked_posts")
-    .select("*")
-    .eq("post_id", post.id)
-    .eq("user_id", userId);
-
-  if (likeError) {
-    console.log(likeError);
-    return;
-  }
-
-  if (existingLikes && existingLikes.length > 0) {
-    alert("Already liked!");
-    return;
-  }
-
-  // INSERT LIKE
-
-  const { error: insertError } = await supabase
-    .from("liked_posts")
-    .insert([
-      {
-        post_id: post.id,
-        user_id: userId,
-      },
-    ]);
-
-  if (insertError) {
-    console.log(insertError);
-    return;
-  }
-
-  // UPDATE POST LIKE COUNT
-
-  await supabase
-    .from("posts")
-    .update({
-      likes: (post.likes || 0) + 1,
-    })
-    .eq("id", post.id);
-
-  // REFRESH POSTS
-
-  getPosts();
-}
   const kalaas = [
 
     {
