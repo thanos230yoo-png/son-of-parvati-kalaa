@@ -113,7 +113,6 @@ export default function AdminPage() {
             image: imageUrl,
             category,
             tags,
-            likes: 0,
           },
         ]);
 
@@ -126,7 +125,7 @@ export default function AdminPage() {
       return;
     }
 
-    alert("Kalaa Uploaded 🔥");
+    alert("Kalaa Uploaded ");
 
     setTitle("");
     setCategory("");
@@ -413,11 +412,9 @@ export default function AdminPage() {
 
               </p>
 
-              <p className="text-pink-400 mt-2">
-
-                ❤️ {post.likes || 0}
-
-              </p>
+              <p className="text-zinc-500 mt-2">
+  Artwork
+</p>
 
               <div className="flex gap-3 mt-4">
 

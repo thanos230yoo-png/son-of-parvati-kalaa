@@ -93,7 +93,7 @@ export default function Home() {
           image: imageUrl,
           category,
           tags: tags || "",
-          likes: 0,
+          
         }
       ]);
 
@@ -116,53 +116,7 @@ export default function Home() {
     }
   }
 
-  async function handleLike(id: number) {
-
-    const post = posts.find((p) => p.id === id);
-
-    if (!post) return;
-
-    const alreadyLiked = localStorage.getItem(`liked-${id}`);
-
-    if (alreadyLiked) {
-      alert("Already liked!");
-      return;
-    }
-
-    const { error: insertError } = await supabase
-      .from("liked_posts")
-      .insert([
-        {
-          post_id: id,
-        },
-      ]);
-
-    if (insertError) {
-      console.log(insertError);
-      alert("Unable to save like");
-      return;
-    }
-
-    const newLikeCount = (post.likes || 0) + 1;
-
-    const { error: updateError } = await supabase
-      .from("posts")
-      .update({
-        likes: newLikeCount,
-      })
-      .eq("id", id);
-
-    if (updateError) {
-      console.log(updateError);
-      alert("Unable to update likes");
-      return;
-    }
-
-    localStorage.setItem(`liked-${id}`, "true");
-
-    await getPosts();
-  }
-
+  
   const kalaas = [
 
     {
@@ -362,12 +316,9 @@ export default function Home() {
 
                   <div className="flex gap-4 mt-4 flex-wrap">
 
-                    <button
-                      onClick={() => handleLike(post.id)}
-                      className="bg-pink-700 hover:bg-pink-900 px-4 py-2 rounded-xl"
-                    >
-                      ❤️ {post.likes || 0}
-                    </button>
+                    <div className="bg-zinc-800 px-4 py-2 rounded-xl text-zinc-300">
+  🎨 Artwork
+</div>
 
                    <button
   onClick={async () => {

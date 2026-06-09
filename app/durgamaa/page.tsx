@@ -34,61 +34,7 @@ export default function DurgaMaaPage() {
   setPosts(filtered);
 }
 
-  async function handleLike(post: any) {
-    let userId = localStorage.getItem("user_id");
-
-    if (!userId) {
-      userId = crypto.randomUUID();
-      localStorage.setItem("user_id", userId);
-    }
-
-    // CHECK IF ALREADY LIKED
-
-    const { data: existingLike } = await supabase
-      .from("liked_posts")
-      .select("*")
-      .eq("post_id", post.id)
-      .eq("user_id", userId)
-      .maybeSingle();
-
-    if (existingLike) {
-      alert("Already liked!");
-      return;
-    }
-
-    // INSERT LIKE
-
-    const { error: insertError } = await supabase
-      .from("liked_posts")
-      .insert([
-        {
-          post_id: post.id,
-          user_id: userId,
-        },
-      ]);
-
-    if (insertError) {
-      console.log(insertError);
-      alert("Like failed");
-      return;
-    }
-
-    // UPDATE POST LIKE COUNT
-
-    const { error: updateError } = await supabase
-      .from("posts")
-      .update({
-        likes: (post.likes || 0) + 1,
-      })
-      .eq("id", post.id);
-
-    if (updateError) {
-      console.log(updateError);
-      return;
-    }
-
-    getPosts();
-  }
+  
 
   async function deletePost(id: number) {
     await supabase
@@ -153,14 +99,11 @@ export default function DurgaMaaPage() {
               </h2>
 
               <div className="flex gap-3 mt-4 flex-wrap">
-                {/* LIKE */}
+                
 
-                <button
-                  onClick={() => handleLike(post)}
-                  className="bg-pink-700 hover:bg-pink-900 px-4 py-2 rounded-xl"
-                >
-                  ❤️ {post.likes || 0}
-                </button>
+                <div className="bg-zinc-800 px-4 py-2 rounded-xl text-zinc-300">
+  🎨 Artwork
+</div>
 
                <button
   onClick={async () => {
