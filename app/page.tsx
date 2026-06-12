@@ -140,10 +140,12 @@ export default function Home() {
     },
 
   ];
-
   const filteredKalaas = kalaas.filter((item) =>
-    item.title.toLowerCase().includes(search.toLowerCase())
-  );
+  item.title.toLowerCase().includes(search.toLowerCase())
+);
+
+  
+  
 
   return (
 
@@ -173,18 +175,12 @@ export default function Home() {
 
       <form
         onSubmit={(e) => {
-          e.preventDefault();
+  e.preventDefault();
 
-          const results = posts.filter((post) =>
-            post.title.toLowerCase().includes(search.toLowerCase())
-          );
-
-          setFilteredPosts(results);
-
-          document
-            .getElementById("uploaded-kalaa")
-            ?.scrollIntoView({ behavior: "smooth" });
-        }}
+  document
+    .getElementById("uploaded-kalaa")
+    ?.scrollIntoView({ behavior: "smooth" });
+}}
         className="flex items-center justify-center gap-3 mt-10 mb-20"
       >
 
@@ -194,16 +190,19 @@ export default function Home() {
           value={search}
           onChange={(e) => {
 
-            const value = e.target.value;
+  const value = e.target.value;
 
-            setSearch(value);
+  setSearch(value);
 
-            const results = posts.filter((post) =>
-              post.title.toLowerCase().includes(value.toLowerCase())
-            );
+  const results = posts.filter((post) =>
+    post.title?.toLowerCase().includes(value.toLowerCase()) ||
+    post.category?.toLowerCase().includes(value.toLowerCase()) ||
+    post.tags?.toLowerCase().includes(value.toLowerCase())
+  );
 
-            setFilteredPosts(results);
-          }}
+  setFilteredPosts(results);
+
+}}
           className="w-[600px] max-w-[90vw] bg-[#111] border border-red-900 text-white px-6 py-4 rounded-full outline-none"
         />
 
@@ -270,11 +269,12 @@ export default function Home() {
         </h1>
 
         <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
-
-          {(search ? filteredPosts : posts)
-            .filter((post) =>
-              post.title.toLowerCase().includes(search.toLowerCase())
-            )
+{(search ? filteredPosts : posts)
+  .filter((post) =>
+    post.title?.toLowerCase().includes(search.toLowerCase()) ||
+    post.category?.toLowerCase().includes(search.toLowerCase()) ||
+    post.tags?.toLowerCase().includes(search.toLowerCase())
+  )
             .map((post) => (
 
               <div
