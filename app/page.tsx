@@ -1,8 +1,11 @@
 "use client";
 
+import { FaInstagram, FaPinterest, FaArtstation } from "react-icons/fa";
+import { SiKofi } from "react-icons/si";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "./lib/supabase";
+
 
 export default function Home() {
 
@@ -172,6 +175,49 @@ export default function Home() {
         </p>
 
       </div>
+      <div className="flex flex-wrap justify-center gap-5 mb-10">
+
+  <a
+    href="https://instagram.com/YOUR_USERNAME"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="flex items-center gap-3 px-6 py-3 rounded-full bg-pink-700/80 hover:bg-pink-600 transition-all duration-300 hover:scale-105"
+  >
+    <FaInstagram size={22} />
+    <span>Instagram</span>
+  </a>
+
+  <a
+    href="https://pinterest.com/YOUR_USERNAME"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="flex items-center gap-3 px-6 py-3 rounded-full bg-red-700/80 hover:bg-red-600 transition-all duration-300 hover:scale-105"
+  >
+    <FaPinterest size={22} />
+    <span>Pinterest</span>
+  </a>
+
+  <a
+    href="https://artstation.com/YOUR_USERNAME"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="flex items-center gap-3 px-6 py-3 rounded-full bg-blue-700/80 hover:bg-blue-600 transition-all duration-300 hover:scale-105"
+  >
+    <FaArtstation size={22} />
+    <span>ArtStation</span>
+  </a>
+
+  <a
+    href="https://ko-fi.com/YOUR_USERNAME"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="flex items-center gap-3 px-6 py-3 rounded-full bg-cyan-700/80 hover:bg-cyan-600 transition-all duration-300 hover:scale-105"
+  >
+    <SiKofi size={22} />
+    <span>Ko-fi</span>
+  </a>
+
+</div>
 
       <form
         onSubmit={(e) => {
